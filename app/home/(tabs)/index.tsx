@@ -1,40 +1,73 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Button, ButtonIcon } from "@gluestack-ui/themed";
-import { PenLine } from "lucide-react-native";
+import { PenLine, Dog, MapPin } from "lucide-react-native";
 
 export default function Home() {
+
+  const handleDono = () => {
+    router.push("../../pages/dono")
+  }
+  const handleAnimal = () => {
+    router.push("../../pages/animal")
+  }
+
   return (
     <View style={styles.container}>
-      <Image
-        source={require("./img/animal_perdido.png")}
+     <Image
+        source={require("../../img/animal_perdido.png")}
         style={styles.backgroundImage}
       />
-
-      <Button
+    <Button
         style={styles.button}
-        size="xs"
+        onPress={handleDono}
+        size="xl"
         variant="solid"
         color="blue"
-        action="primary"
+        action="primary"r
       >
         <ButtonIcon as={PenLine} />
       </Button>
+    
       <Text style={styles.texto}>Cadastro do dono</Text>
-
+    
       <Button
         style={styles.button}
-        size="xs"
+        onPress={handleAnimal}
+        size="xl"
         variant="solid"
         color="blue"
-        action="primary"
+        action="primary"r
       >
         <ButtonIcon as={PenLine} />
       </Button>
       <Text style={styles.texto}>Cadastro do animal</Text>
 
-      <Link href="/">Voltar ao login</Link>
+      <Button
+        style={styles.button}
+        size="md"
+        variant="solid"
+        color="blue"
+        action="primary"
+      >
+        <ButtonIcon as={Dog} />
+      </Button>
+      <Text style={styles.texto}>Consulta situação</Text>
+
+      <Button
+        style={styles.button}
+        size="md"
+        variant="solid"
+        color="blue"
+        action="primary"
+      >
+        <ButtonIcon as={MapPin} />
+      </Button>
+      <Text style={styles.texto}>Animal localizado</Text>
+
+
+      <Link style={styles.link1} href="/">Voltar ao login</Link>
       <StatusBar style="auto" />
     </View>
   );
@@ -46,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexDirection: "row",
     flexWrap: "wrap",
-    alignContent: "space-between",
+    alignContent: "stretch",
   },
   backgroundImage: {
     resizeMode: "cover",
@@ -60,10 +93,21 @@ const styles = StyleSheet.create({
     marginTop: 150,
   },
   button: {
-    marginLeft: 30,
+    marginTop: 110,
+    marginLeft: 20,
   },
   texto: {
-    marginLeft: 10,
-    size: "xl",
+    marginTop: 110,
+    marginLeft: 20,
+    fontSize: 30,
+    color: "#714422",
   },
+  link: {
+    marginTop:150,
+    marginLeft: 20,
+   },
+   link1: {
+    marginTop: 100,
+    color: "#2596be",
+   },
 });
