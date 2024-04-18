@@ -5,7 +5,7 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("./img/animal_perdido.png")}
+        source={require("../../img/animal_perdido.png")}
         style={styles.backgroundImage}
       />
       <Text>Settings</Text>
