@@ -3,14 +3,25 @@ import { Link, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Button, ButtonIcon } from "@gluestack-ui/themed";
 import { PenLine, Dog, MapPin } from "lucide-react-native";
+import { useAuth } from "../../../hooks/auth";
+import React, { useEffect, useState } from "react";
+import { AntDesign } from '@expo/vector-icons';
 
 export default function Home() {
+
+  const auth = useAuth()
 
   const handleDono = () => {
     router.push("../../pages/dono")
   }
   const handleAnimal = () => {
     router.push("../../pages/animal")
+  }
+  const handleLocalizacao = () => {
+    router.push("../../pages/localizado")
+  }
+  const handleSituacao = () => {
+    router.push("../../pages/situacao")
   }
 
   return (
@@ -25,7 +36,7 @@ export default function Home() {
         size="xl"
         variant="solid"
         color="blue"
-        action="primary"r
+        action="primary"
       >
         <ButtonIcon as={PenLine} />
       </Button>
@@ -38,7 +49,7 @@ export default function Home() {
         size="xl"
         variant="solid"
         color="blue"
-        action="primary"r
+        action="primary"
       >
         <ButtonIcon as={PenLine} />
       </Button>
@@ -46,6 +57,7 @@ export default function Home() {
 
       <Button
         style={styles.button}
+        onPress={handleSituacao}
         size="md"
         variant="solid"
         color="blue"
@@ -57,6 +69,7 @@ export default function Home() {
 
       <Button
         style={styles.button}
+        onPress={handleLocalizacao}
         size="md"
         variant="solid"
         color="blue"
@@ -66,8 +79,9 @@ export default function Home() {
       </Button>
       <Text style={styles.texto}>Animal localizado</Text>
 
-
-      <Link style={styles.link1} href="/">Voltar ao login</Link>
+      <Link style={styles.link} href="/">
+      <AntDesign style={styles.icon} name="banckward" size={24} />
+        Voltar ao login</Link>
       <StatusBar style="auto" />
     </View>
   );
@@ -103,11 +117,10 @@ const styles = StyleSheet.create({
     color: "#714422",
   },
   link: {
-    marginTop:150,
+    marginTop:50,
     marginLeft: 20,
    },
-   link1: {
-    marginTop: 100,
-    color: "#2596be",
-   },
+   icon: {
+    color:"#554142"
+  },
 });

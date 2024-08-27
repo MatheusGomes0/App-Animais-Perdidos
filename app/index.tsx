@@ -1,22 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Image } from "react-native";
 import { router } from "expo-router";
-import { LogIn } from 'lucide-react-native'
-import { useAuth } from '../hooks/auth'
-import { Entypo } from '@expo/vector-icons'
 import {
   Input,
   InputField,
   Text,
   Button,
-  ButtonText, ButtonIcon,
-  Icon
+  ButtonText,
 } from "@gluestack-ui/themed";
+import { Entypo } from "@expo/vector-icons";
 
 export default function Login() {
-  const handleLogin = () =>{
-    router.push('home')
-  }
+  const handleLogin = () => {
+    router.push("home");
+  };
 
   return (
     <View style={styles.container}>
@@ -27,16 +24,24 @@ export default function Login() {
 
       <Text size="sm">Tela de login</Text>
 
-      <Input variant='outline' size='md' mb={8}>
-        <InputField placeholder='Digite o seu e-mail' />
+      <Input variant="rounded" size="md" mb={8}>
+        <InputField placeholder="Digite o seu e-mail!" />
       </Input>
 
-      <Input variant='outline' size='md' mb={8}>
-        <InputField type='password' placeholder='Digite a sua senha' />
+      <Input variant="rounded" size="md" mb={8}>
+        <InputField type="password" placeholder="Digite sua senha!" />
       </Input>
 
-      <Button onPress={handleLogin} size='lg' variant='solid' action='primary'>
-        <ButtonText>Acessar o app <Entypo name="login" size={24} color="black" /></ButtonText>
+      <Button
+        style={styles.button}
+        onPress={handleLogin}
+        size="lg"
+        variant="solid"
+        action="primary"
+      >
+        <ButtonText>
+          Acessar o app <Entypo name="login" size={24} color="black" />
+        </ButtonText>
       </Button>
 
       <StatusBar style="auto" />
