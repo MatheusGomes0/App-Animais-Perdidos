@@ -14,8 +14,17 @@ export default function Localizacao() {
       />
 
     <Heading style={styles.heading}>Localizados</Heading>
+
+    <Text style={styles.text}>Nome do animal localizado</Text>
+
     <Input style={styles.input} variant="outline" size="sm" mb={8} width={'78%'}>
-        <InputField placeholder="Nome do cachorro" />
+        <InputField placeholder="" />
+      </Input>
+
+      <Text style={styles.text}>Endereço localização do animal</Text>
+
+    <Input style={styles.input} variant="outline" size="sm" mb={8} width={'78%'}>
+        <InputField placeholder="" />
       </Input>
 
     <MapView style={styles.map} 
@@ -73,8 +82,8 @@ const styles = StyleSheet.create({
     marginTop:150,
   },
   text: {
-    marginTop: 60,
-    marginLeft: 20,
+    marginTop: 30,
+    marginLeft: 90,
     color: "blue"
   },
   heading: {
@@ -85,17 +94,17 @@ const styles = StyleSheet.create({
   },
   input: {
     marginTop: 10,
-    marginLeft: 80,
+    marginLeft: 40,
     backgroundColor: "#cdcccc",
-    opacity: 0.3,
+    opacity: 0.6,
   },map: {
-    marginTop: 300,
+    marginTop: 150,
     marginLeft: 50,
     width: '75%',
     height: '30%',
   },
   link: {
-    marginTop:70,
+    marginTop:100,
     marginLeft: 10,
     color:"#04bbfa"
   },

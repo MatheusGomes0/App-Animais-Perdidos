@@ -1,12 +1,36 @@
-
-import { CheckIcon, Checkbox, CheckboxIcon, CheckboxIndicator, 
+import React, { useState } from "react";
+import { Button, ButtonIcon, ButtonText, CheckIcon, Checkbox, CheckboxIcon, CheckboxIndicator, 
          CheckboxLabel, Heading, Input, InputField } from "@gluestack-ui/themed";
 import { Text, StyleSheet, View, Image } from "react-native";
 import { Link } from "expo-router";
 import { AntDesign } from '@expo/vector-icons';
 import MapView, { Circle, Marker } from 'react-native-maps';
+import { HeartHandshake } from "lucide-react-native";
 
 export default function Situacao() {
+
+  const [isSecondCheckBoxChecked, setIsSecondCheckBoxChecked] = useState(true);
+  const [isFirstCheckBoxChecked, setIsFirstCheckBoxChecked] = useState(false);
+  const [isInputEnable, setInputEnable] = useState(false);
+
+  const handleSecondCheckBoxChange = () => {
+    const newValue = !isSecondCheckBoxChecked;
+    setIsSecondCheckBoxChecked(newValue);
+    if(!newValue){
+      setIsFirstCheckBoxChecked(false);
+      setInputEnable(false);
+    }
+  };
+
+    const handleFirstCheckBoxChange =() => {
+      const newValue = !isFirstCheckBoxChecked;
+      setIsFirstCheckBoxChecked(newValue);
+      setInputEnable(newValue);
+    if(newValue){
+      setIsSecondCheckBoxChecked(false);
+      }
+    };
+
   return(
     <View style={styles.container}>
 
@@ -17,28 +41,54 @@ export default function Situacao() {
 
       <Heading style={styles.heading}>Status da Busca</Heading>
 
-      <Text style={styles.text}>Nome do animal perdido</Text>
+      <Text style={styles.text}>                 Rex</Text>
 
-      <Text style={styles.text1}>Endereço do desaparecimento</Text>
+      <Text style={styles.text1}>Rua Themistocles Zoppi, 110 - Jd Santiago</Text>
       
-      <Checkbox style={styles.check} size="md" isInvalid={false} isDisabled={false} defaultIsChecked={true} value={""}   >
+      <Checkbox style={styles.check}
+        size="md"
+        isDisabled={isSecondCheckBoxChecked}
+        isChecked={isFirstCheckBoxChecked}
+        value={isFirstCheckBoxChecked ? "checked" : ""}
+        onChange={handleFirstCheckBoxChange}>
+
             <CheckboxIndicator>
               <CheckboxIcon as={CheckIcon}/>
             </CheckboxIndicator>
             <CheckboxLabel style={styles.checkLabel}>Encontrado</CheckboxLabel>
           </Checkbox>
 
-        <Checkbox style={styles.check1} size="md" isInvalid={false} isDisabled={false} value={""}   >
+        <Checkbox style={styles.check1} 
+        size="md" 
+        isDisabled={isFirstCheckBoxChecked}
+        isChecked={isSecondCheckBoxChecked}
+        value={isSecondCheckBoxChecked ? "checked" : ""}
+        onChange={handleSecondCheckBoxChange}
+        >
             <CheckboxIndicator>
               <CheckboxIcon as={CheckIcon}/>
             </CheckboxIndicator>
             <CheckboxLabel style={styles.checkLabel}>Não encontrado</CheckboxLabel>
           </Checkbox>
 
-     <Input style={styles.input} variant="outline" size="sm" mb={8} width={'78%'}>
+     <Input style={[styles.input, { opacity: isInputEnable ? 1 : 0.7 }]} 
+        variant="outline" 
+        size="sm" 
+        mb={8} 
+        width={'78%'}
+        isDisabled={!isInputEnable}>
         <InputField placeholder="" />
   </Input>
       
+  <Button  style={styles.button}
+        size="lg"
+        variant="solid"
+        action="primary"
+      >
+        <ButtonText>Gravar</ButtonText>
+        <ButtonIcon style={styles.btIcon} as={HeartHandshake} />
+      </Button>
+
       <MapView style={styles.map} 
         initialRegion={{
           latitude: -23.094925761593053,
@@ -69,7 +119,7 @@ export default function Situacao() {
 
       <Link style={styles.link} href="/home">
         <AntDesign style={styles.icon} name="banckward" size={24} />
-        <Text>Voltar</Text>
+        <Text style={styles.linkText}>Voltar à Home</Text>
       </Link>
     </View>
   );
@@ -102,14 +152,14 @@ const styles = StyleSheet.create({
     color: "#165a72",
   },
   text: {
-    marginTop: 40,
+    marginTop: 60,
     marginLeft: 80,
     fontSize: 20,
     fontWeight: "bold",
     color: "blue"
   },
   text1: {
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: 50,
     fontSize: 20,
     fontWeight: "bold",
@@ -131,21 +181,31 @@ const styles = StyleSheet.create({
     color: "blue"
   },
   input: {
-    marginTop: 30,
+    marginTop: 40,
     marginLeft: 50,
     backgroundColor: "#cdcccc",
     opacity: 0.7
   },
   map: {
-    marginTop: 120,
+    marginTop: 40,
     marginLeft: 50,
     width: '75%',
     height: '30%',
   },
   link: {
-    marginTop:50,
+    marginTop:30,
     marginLeft: 10,
     color:"#04bbfa"
+  },
+  linkText:{
+    marginLeft: 10
+  },
+  button: {
+    marginTop: 10,
+    marginLeft: 250
+  },
+  btIcon:{
+    marginLeft:4
   },
   icon: {
     color:"#554142"
