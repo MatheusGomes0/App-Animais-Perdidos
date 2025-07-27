@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Image } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import {
   Input,
@@ -8,28 +8,34 @@ import {
   Button,
   ButtonText,
 } from "@gluestack-ui/themed";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 
 export default function Login() {
   const handleLogin = () => {
-    router.push("home");
+    router.push("/home");
+  };
+
+  const handleCadastro = () => {
+    router.push("/pages/cadastro");
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("./img/animal_perdido.png")}
-        style={styles.backgroundImage}
-      />
 
-      <Text size="sm">Tela de login</Text>
+      <View style={styles.logoContainer}>
+        <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginRight: 8 }} />
+        <Text style={styles.logoText}>Where's my PET?</Text>
+        <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      </View>
 
-      <Input variant="rounded" size="md" mb={8}>
-        <InputField placeholder="Digite o seu e-mail!" />
+      <Text style={styles.heading}>Entrar no app</Text>
+
+      <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+        <InputField placeholder="Digite o seu e-mail" keyboardType="email-address" />
       </Input>
 
-      <Input variant="rounded" size="md" mb={8}>
-        <InputField type="password" placeholder="Digite sua senha!" />
+      <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+        <InputField placeholder="Digite sua senha" secureTextEntry />
       </Input>
 
       <Button
@@ -40,8 +46,18 @@ export default function Login() {
         action="primary"
       >
         <ButtonText>
-          Acessar o app <Entypo name="login" size={24} color="black" />
+          Acessar o app <Entypo name="login" size={18} color="#fff" />
         </ButtonText>
+      </Button>
+
+      <Button
+        style={styles.buttonSecondary}
+        onPress={handleCadastro}
+        size="lg"
+        variant="outline"
+        action="secondary"
+      >
+        <ButtonText style={{ color: "#2b6cb0" }}>Cadastrar-se</ButtonText>
       </Button>
 
       <StatusBar style="auto" />
@@ -52,21 +68,45 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f7fa",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
-  backgroundImage: {
-    resizeMode: "cover",
-    flex: 1,
-    justifyContent: "center",
+  logoContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "60%",
-    opacity: 0.6,
+    marginBottom: 12,
+  },
+  logoText: {
+    fontSize: 40,
+    color: "#165a72",
+    fontWeight: "bold",
+  },
+  heading: {
+    fontSize: 20,
+    color: "#333",
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#cbd5e0",
+    marginBottom: 16,
   },
   button: {
-    marginTop: 55,
+    marginTop: 20,
+    width: "90%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
+  },
+  buttonSecondary: {
+    marginTop: 10,
+    width: "90%",
+    borderColor: "#2b6cb0",
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: "#fff",
   },
 });

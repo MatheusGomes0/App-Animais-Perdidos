@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { Button, ButtonIcon, ButtonText, Heading, Input, InputField } from "@gluestack-ui/themed";
-import { Text, StyleSheet, View, Image, Alert } from "react-native";
+import {
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Heading,
+  Input,
+  InputField,
+} from "@gluestack-ui/themed";
+import { Text, StyleSheet, View, Alert, ScrollView } from "react-native";
 import { Link } from "expo-router";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { Disc3 } from "lucide-react-native";
-import axios from "axios"; 
+import axios from "axios";
 
 export default function Dono() {
-  // Estados para armazenar os valores dos inputs
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
   const [endereco, setEndereco] = useState("");
@@ -16,20 +22,26 @@ export default function Dono() {
   const [estado, setEstado] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
-  
-  // Estado para controlar se o botão está habilitado
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  // Verifica se todos os campos estão preenchidos
   useEffect(() => {
-    if (nome && sobrenome && endereco && bairro && cidade && estado && telefone && email) {
+    if (
+      nome &&
+      sobrenome &&
+      endereco &&
+      bairro &&
+      cidade &&
+      estado &&
+      telefone &&
+      email
+    ) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
   }, [nome, sobrenome, endereco, bairro, cidade, estado, telefone, email]);
 
-  // Função para enviar os dados para a API
   const handleSubmit = async () => {
     try {
       await axios.post("http://localhost:3000/donos", {
@@ -40,13 +52,11 @@ export default function Dono() {
         cidade,
         estado,
         telefone,
-        email
+        email,
       });
 
-      // Exibe uma mensagem de sucesso
       Alert.alert("Sucesso", "Dados gravados com sucesso!");
 
-      // Limpa o formulário
       setNome("");
       setSobrenome("");
       setEndereco("");
@@ -55,64 +65,110 @@ export default function Dono() {
       setEstado("");
       setTelefone("");
       setEmail("");
-      setIsButtonDisabled(true); 
-
+      setIsButtonDisabled(true);
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao gravar os dados.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require("../img/animal_perdido.png")} style={styles.backgroundImage} />
-      <Heading style={styles.heading}>Cadastro dono</Heading>
+    <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.text}>Nome:</Text>
 
-      <Input style={styles.input} variant="outline" size="sm" mb={8} width={"80%"}>
-        <InputField value={nome} onChangeText={setNome} placeholder="" />
+      <View style={styles.logoContainer}>
+       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}> Dados do Dono</Heading>
+       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      </View>
+
+
+      {/* Campo Nome */}
+      <Text style={styles.label}>Nome:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={nome}
+          onChangeText={setNome}
+          placeholder="Digite seu nome"
+        />
       </Input>
 
-      <Text style={styles.text}>Sobrenome:</Text>
-
-      <Input style={styles.input} variant="outline" size="sm" mb={8} width={"70%"}>
-        <InputField value={sobrenome} onChangeText={setSobrenome} placeholder="" />
+      {/* Campo Sobrenome */}
+      <Text style={styles.label}>Sobrenome:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={sobrenome}
+          onChangeText={setSobrenome}
+          placeholder="Digite seu sobrenome"
+        />
       </Input>
 
-      <Text style={styles.text}>Endereço:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"72%"}>
-        <InputField value={endereco} onChangeText={setEndereco} placeholder="" />
+      {/* Campo Endereço */}
+      <Text style={styles.label}>Endereço:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={endereco}
+          onChangeText={setEndereco}
+          placeholder="Digite seu endereço"
+        />
       </Input>
 
-      <Text style={styles.text}>Bairro:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"78%"}>
-        <InputField value={bairro} onChangeText={setBairro} placeholder="" />
+      {/* Campo Bairro */}
+      <Text style={styles.label}>Bairro:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={bairro}
+          onChangeText={setBairro}
+          placeholder="Digite seu bairro"
+        />
       </Input>
 
-      <Text style={styles.text}>Cidade:</Text>
+      {/* Cidade e Estado lado a lado */}
+      <View style={styles.row}>
+        <View style={styles.cityContainer}>
+          <Text style={styles.label}>Cidade:</Text>
+          <Input style={styles.input} variant="outline" size="md" width="100%">
+            <InputField
+              value={cidade}
+              onChangeText={setCidade}
+              placeholder="Digite sua cidade"
+            />
+          </Input>
+        </View>
 
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"75%"}>
-        <InputField value={cidade} onChangeText={setCidade} placeholder="" />
+        <View style={styles.stateContainer}>
+          <Text style={styles.label}>Estado:</Text>
+          <Input style={styles.input} variant="outline" size="md" width="100%">
+            <InputField
+              value={estado}
+              onChangeText={setEstado}
+              placeholder="UF"
+              maxLength={2}
+            />
+          </Input>
+        </View>
+      </View>
+
+      {/* Campo Telefone embaixo de Cidade/Estado */}
+      <Text style={styles.label}>Telefone:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={telefone}
+          onChangeText={setTelefone}
+          placeholder="(XX) XXXXX-XXXX"
+          keyboardType="phone-pad"
+        />
       </Input>
 
-      <Text style={styles.text}>Estado:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"10%"}>
-        <InputField value={estado} onChangeText={setEstado} placeholder="" />
-      </Input>
-
-      <Text style={styles.text}>Tel:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"52%"}>
-        <InputField value={telefone} onChangeText={setTelefone} placeholder="" />
-      </Input>
-
-      <Text style={styles.text}>E-mail:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"75%"}>
-        <InputField value={email} onChangeText={setEmail} placeholder="" />
+      {/* Campo Email */}
+      <Text style={styles.label}>E-mail:</Text>
+      <Input style={styles.input} variant="outline" size="md" width="100%">
+        <InputField
+          value={email}
+          onChangeText={setEmail}
+          placeholder="seu@email.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
       </Input>
 
       <Button
@@ -121,69 +177,90 @@ export default function Dono() {
         variant="solid"
         action="primary"
         onPress={handleSubmit}
-        isDisabled={isButtonDisabled} 
+        isDisabled={isButtonDisabled}
       >
-        <ButtonText>Gravar</ButtonText>
+        <ButtonText>Editar</ButtonText>
         <ButtonIcon style={styles.btIcon} as={Disc3} />
       </Button>
 
       <Link style={styles.link} href="/home">
-        <AntDesign style={styles.icon} name="banckward" size={24} /> Voltar a Home
+        <AntDesign name="arrowleft" size={24} color="#2b6cb0" />
+        <Text style={styles.linkText}> Voltar à Home</Text>
       </Link>
-    </View>
-    
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignContent: "flex-start",
-  },
-  backgroundImage: {
-    resizeMode: "cover",
-    flex: 1,
-    justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: "#f5f7fa",
     alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "60%",
-    opacity: 0.6,
-    marginTop: 150,
   },
-  text: {
-    marginTop: 40,
-    marginLeft: 20,
-    color: "blue",
-  },
-  input: {
-    marginTop: 40,
-    marginLeft: 10,
-    backgroundColor: "#cdcccc",
-    opacity: 0.7,
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
   },
   heading: {
-    marginTop: 60,
-    marginLeft: 150,
-    marginRight: 100,
+    fontSize: 28,
     color: "#165a72",
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginTop: 30, // título um pouco mais para baixo
+    textAlign: "center",
   },
-  link: {
-    marginTop: 60,
-    marginLeft: 10,
-    color: "#04bbfa",
+  label: {
+    alignSelf: "flex-start",
+    marginLeft: 8,
+    marginTop: 12,
+    marginBottom: 6,
+    fontSize: 16,
+    color: "#2b6cb0",
+    fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#cbd5e0",
+    marginBottom: 12,
+  },
+  row: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  cityContainer: {
+    width: "65%",
+  },
+  stateContainer: {
+    width: "30%",
   },
   button: {
-    marginTop: 10,
-    marginLeft: 250,
+    width: "100%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center", // centraliza verticalmente
+    justifyContent: "center", // centraliza horizontalmente (texto e ícone)
+    paddingVertical: 14,
+    marginTop: 20,
   },
   btIcon: {
-    marginLeft: 4,
+    marginLeft: 6,
+    color: "#fff",
   },
-  icon: {
-    color: "#554142",
+  link: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 25,
+    marginBottom: 40,
+  },
+  linkText: {
+    marginLeft: 8,
+    color: "#2b6cb0",
+    fontSize: 16,
   },
 });

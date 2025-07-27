@@ -1,87 +1,79 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Link, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Button, ButtonIcon } from "@gluestack-ui/themed";
 import { PenLine, Dog, MapPin } from "lucide-react-native";
 import { useAuth } from "../../../hooks/auth";
-import React, { useEffect, useState } from "react";
-import { AntDesign } from '@expo/vector-icons';
+import React from "react";
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 
 export default function Home() {
+  const auth = useAuth();
 
-  const auth = useAuth()
-
-  const handleDono = () => {
-    router.push("../../pages/dono")
-  }
-  const handleAnimal = () => {
-    router.push("../../pages/animal")
-  }
-  const handleLocalizacao = () => {
-    router.push("../../pages/localizado")
-  }
-  const handleSituacao = () => {
-    router.push("../../pages/situacao")
-  }
+  const handleDono = () => router.push("../../pages/dono");
+  const handleAnimal = () => router.push("../../pages/animal");
+  const handleLocalizacao = () => router.push("../../pages/localizar");
+  const handleSituacao = () => router.push("../../pages/situacao");
 
   return (
     <View style={styles.container}>
-     <Image
-        source={require("../../img/animal_perdido.png")}
-        style={styles.backgroundImage}
-      />
-    <Button
-        style={styles.button}
-        onPress={handleDono}
-        size="xl"
-        variant="solid"
-        color="blue"
-        action="primary"
-      >
-        <ButtonIcon as={PenLine} />
-      </Button>
-    
-      <Text style={styles.texto}>Cadastro do dono</Text>
-    
-      <Button
-        style={styles.button}
-        onPress={handleAnimal}
-        size="xl"
-        variant="solid"
-        color="blue"
-        action="primary"
-      >
-        <ButtonIcon as={PenLine} />
-      </Button>
-      <Text style={styles.texto}>Cadastro do animal</Text>
+      <View style={styles.header}>
+        <FontAwesome5 name="cat" size={28} color="#2b6cb0" style={{ marginRight: 6 }} />
+        <Text style={styles.headerText}>Home</Text>
+        <FontAwesome5 name="dog" size={28} color="#2b6cb0" style={{ marginLeft: 6 }} />
+      </View>
 
-      <Button
-        style={styles.button}
-        onPress={handleSituacao}
-        size="md"
-        variant="solid"
-        color="blue"
-        action="primary"
-      >
-        <ButtonIcon as={Dog} />
-      </Button>
-      <Text style={styles.texto}>Consulta situação</Text>
+      <View style={styles.buttonGroup}>
+        <Button
+          style={styles.button}
+          onPress={handleDono}
+          size="lg"
+          variant="solid"
+          action="primary"
+        >
+          <ButtonIcon as={PenLine} />
+          <Text style={styles.buttonText}>Cadastro do dono</Text>
+        </Button>
 
-      <Button
-        style={styles.button}
-        onPress={handleLocalizacao}
-        size="md"
-        variant="solid"
-        color="blue"
-        action="primary"
-      >
-        <ButtonIcon as={MapPin} />
-      </Button>
-      <Text style={styles.texto}>Animal localizado</Text>
+        <Button
+          style={styles.button}
+          onPress={handleAnimal}
+          size="lg"
+          variant="solid"
+          action="primary"
+        >
+          <ButtonIcon as={PenLine} />
+          <Text style={styles.buttonText}>Cadastro do animal</Text>
+        </Button>
+
+        <Button
+          style={styles.button}
+          onPress={handleSituacao}
+          size="lg"
+          variant="solid"
+          action="primary"
+        >
+          <ButtonIcon as={Dog} />
+          <Text style={styles.buttonText}>Consulta situação</Text>
+        </Button>
+
+        <Button
+          style={styles.button}
+          onPress={handleLocalizacao}
+          size="lg"
+          variant="solid"
+          action="primary"
+        >
+          <ButtonIcon as={MapPin} />
+          <Text style={styles.buttonText}>Localizar animais</Text>
+        </Button>
+      </View>
 
       <Link style={styles.link} href="/">
-      <AntDesign style={styles.icon} name="banckward" size={24} />
-        Voltar ao login</Link>
+        <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
+        <Text style={styles.linkText}>Voltar ao login</Text>
+      </Link>
+
       <StatusBar style="auto" />
     </View>
   );
@@ -90,37 +82,50 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignContent: "stretch",
-  },
-  backgroundImage: {
-    resizeMode: "cover",
-    flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#f5f7fa",
     alignItems: "center",
-    position: "absolute",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  headerText: {
+    fontSize: 40,
+    color: "#165a72",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  buttonGroup: {
     width: "100%",
-    height: "60%",
-    opacity: 0.6,
-    marginTop: 150,
+    alignItems: "center",
   },
   button: {
-    marginTop: 110,
-    marginLeft: 20,
+    marginVertical: 10,
+    width: "100%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
   },
-  texto: {
-    marginTop: 110,
-    marginLeft: 20,
-    fontSize: 30,
-    color: "#714422",
+  buttonText: {
+    color: "white",
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: "500",
   },
   link: {
-    marginTop:50,
-    marginLeft: 20,
-   },
-   icon: {
-    color:"#554142"
+    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  linkText: {
+    marginLeft: 8,
+    color: "#2b6cb0",
+    fontSize: 16,
   },
 });

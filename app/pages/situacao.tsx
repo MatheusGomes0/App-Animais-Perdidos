@@ -1,11 +1,23 @@
 import React, { useState } from "react";
-import { Button, ButtonIcon, ButtonText, CheckIcon, Checkbox, CheckboxIcon, CheckboxIndicator, 
-         CheckboxLabel, Heading, Input, InputField } from "@gluestack-ui/themed";
+import {
+  Button,
+  ButtonIcon,
+  ButtonText,
+  CheckIcon,
+  Checkbox,
+  CheckboxIcon,
+  CheckboxIndicator,
+  CheckboxLabel,
+  Heading,
+  Input,
+  InputField,
+} from "@gluestack-ui/themed";
 import { Text, StyleSheet, View, Image } from "react-native";
 import { Link } from "expo-router";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import MapView, { Circle, Marker } from 'react-native-maps';
 import { HeartHandshake } from "lucide-react-native";
+
 
 export default function Situacao() {
 
@@ -16,94 +28,99 @@ export default function Situacao() {
   const handleSecondCheckBoxChange = () => {
     const newValue = !isSecondCheckBoxChecked;
     setIsSecondCheckBoxChecked(newValue);
-    if(!newValue){
+    if (!newValue) {
       setIsFirstCheckBoxChecked(false);
       setInputEnable(false);
     }
   };
 
-    const handleFirstCheckBoxChange =() => {
-      const newValue = !isFirstCheckBoxChecked;
-      setIsFirstCheckBoxChecked(newValue);
-      setInputEnable(newValue);
-    if(newValue){
+  const handleFirstCheckBoxChange = () => {
+    const newValue = !isFirstCheckBoxChecked;
+    setIsFirstCheckBoxChecked(newValue);
+    setInputEnable(newValue);
+    if (newValue) {
       setIsSecondCheckBoxChecked(false);
-      }
-    };
+    }
+  };
 
-  return(
+  return (
     <View style={styles.container}>
 
-      <Image
-        source={require("../img/animal_perdido.png")}
-        style={styles.backgroundImage}
-      />
+        <View style={styles.logoContainer}>
+       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}>  Status da Busca</Heading>
+       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      </View>
 
-      <Heading style={styles.heading}>Status da Busca</Heading>
+      <Text style={styles.petName}>🐶 Rex</Text>
+      <Text style={styles.address}>Rua Themistocles Zoppi, 110 - Jd Santiago</Text>
 
-      <Text style={styles.text}>                 Rex</Text>
-
-      <Text style={styles.text1}>Rua Themistocles Zoppi, 110 - Jd Santiago</Text>
-      
-      <Checkbox style={styles.check}
-        size="md"
-        isDisabled={isSecondCheckBoxChecked}
-        isChecked={isFirstCheckBoxChecked}
-        value={isFirstCheckBoxChecked ? "checked" : ""}
-        onChange={handleFirstCheckBoxChange}>
-
-            <CheckboxIndicator>
-              <CheckboxIcon as={CheckIcon}/>
-            </CheckboxIndicator>
-            <CheckboxLabel style={styles.checkLabel}>Encontrado</CheckboxLabel>
-          </Checkbox>
-
-        <Checkbox style={styles.check1} 
-        size="md" 
-        isDisabled={isFirstCheckBoxChecked}
-        isChecked={isSecondCheckBoxChecked}
-        value={isSecondCheckBoxChecked ? "checked" : ""}
-        onChange={handleSecondCheckBoxChange}
+      <View style={styles.checkGroup}>
+        <Checkbox
+          size="md"
+          isDisabled={isSecondCheckBoxChecked}
+          isChecked={isFirstCheckBoxChecked}
+          value={isFirstCheckBoxChecked ? "checked" : ""}
+          onChange={handleFirstCheckBoxChange}
+          style={styles.checkbox}
         >
-            <CheckboxIndicator>
-              <CheckboxIcon as={CheckIcon}/>
-            </CheckboxIndicator>
-            <CheckboxLabel style={styles.checkLabel}>Não encontrado</CheckboxLabel>
-          </Checkbox>
+          <CheckboxIndicator>
+            <CheckboxIcon as={CheckIcon} />
+          </CheckboxIndicator>
+          <CheckboxLabel style={styles.checkLabel}>Encontrado</CheckboxLabel>
+        </Checkbox>
 
-     <Input style={[styles.input, { opacity: isInputEnable ? 1 : 0.7 }]} 
-        variant="outline" 
-        size="sm" 
-        mb={8} 
-        width={'78%'}
-        isDisabled={!isInputEnable}>
-        <InputField placeholder="" />
-  </Input>
-      
-  <Button  style={styles.button}
+        <Checkbox
+          size="md"
+          isDisabled={isFirstCheckBoxChecked}
+          isChecked={isSecondCheckBoxChecked}
+          value={isSecondCheckBoxChecked ? "checked" : ""}
+          onChange={handleSecondCheckBoxChange}
+          style={styles.checkbox}
+        >
+          <CheckboxIndicator>
+            <CheckboxIcon as={CheckIcon} />
+          </CheckboxIndicator>
+          <CheckboxLabel style={styles.checkLabel}>Não encontrado</CheckboxLabel>
+        </Checkbox>
+      </View>
+
+      <Input
+        style={styles.input}
+        variant="outline"
+        size="md"
+        mb={8}
+        width={'90%'}
+        isDisabled={!isInputEnable}
+      >
+        <InputField placeholder="Observações (opcional)" />
+      </Input>
+
+      <Button
+        style={styles.button}
         size="lg"
         variant="solid"
         action="primary"
       >
-        <ButtonText>Gravar</ButtonText>
-        <ButtonIcon style={styles.btIcon} as={HeartHandshake} />
+        <ButtonText>Mudar Status </ButtonText>
+        <ButtonIcon as={HeartHandshake} />
       </Button>
 
-      <MapView style={styles.map} 
+      <MapView
+        style={styles.map}
         initialRegion={{
           latitude: -23.094925761593053,
           longitude: -47.19621286287202,
-          latitudeDelta: 0.0020, 
+          latitudeDelta: 0.0020,
           longitudeDelta: 0.0020,
         }}
       >
         <Marker
           coordinate={{
-            latitude: -23.094925761593053, 
+            latitude: -23.094925761593053,
             longitude: -47.19621286287202,
           }}
-            image={require('../img/tach_red.png')}
-
+          image={require('../img/tach_red.png')}
         />
         <Circle
           center={{
@@ -113,12 +130,12 @@ export default function Situacao() {
           radius={80}
           strokeColor="red"
           strokeWidth={2}
-          fillColor="rgba(255, 0, 0, 0)"
+          fillColor="rgba(255, 0, 0, 0.1)"
         />
       </MapView>
 
       <Link style={styles.link} href="/home">
-        <AntDesign style={styles.icon} name="banckward" size={24} />
+        <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
         <Text style={styles.linkText}>Voltar à Home</Text>
       </Link>
     </View>
@@ -128,86 +145,80 @@ export default function Situacao() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignContent: "flex-start",
-  },
-  backgroundImage: {
-    resizeMode: "cover",
-    flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#f5f7fa",
     alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "60%",
-    opacity: 0.6,
-    marginTop:150,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+   logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
   },
   heading: {
-    marginTop: 60,
-    marginLeft: 80,
-    marginRight: 80,
     fontSize: 30,
     color: "#165a72",
-  },
-  text: {
-    marginTop: 60,
-    marginLeft: 80,
-    fontSize: 20,
     fontWeight: "bold",
-    color: "blue"
+    marginBottom: 1,
+    textAlign: "center",
   },
-  text1: {
-    marginTop: 30,
-    marginLeft: 50,
-    fontSize: 20,
+  petName: {
+    fontSize: 22,
     fontWeight: "bold",
-    color: "blue"
+    color: "#2b6cb0",
+    marginTop: 8,
   },
-  check:{
-    marginTop: 70,
-    marginLeft: 50,
-    borderBottomColor: "black",
-    color: "blue"
+  address: {
+    fontSize: 16,
+    color: "#333",
+    marginVertical: 8,
+    textAlign: "center",
   },
-  check1:{
-    marginTop: 70,
-    marginLeft: 70,
-    color: "blue"
+  checkGroup: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    width: "90%",
+    marginVertical: 12,
   },
-  checkLabel:{
-    marginLeft: 5,
-    color: "blue"
+  checkbox: {
+    marginVertical: 8,
+  },
+  checkLabel: {
+    marginLeft: 6,
+    fontSize: 16,
+    color: "#2b6cb0",
   },
   input: {
-    marginTop: 40,
-    marginLeft: 50,
-    backgroundColor: "#cdcccc",
-    opacity: 0.7
-  },
-  map: {
-    marginTop: 40,
-    marginLeft: 50,
-    width: '75%',
-    height: '30%',
-  },
-  link: {
-    marginTop:30,
-    marginLeft: 10,
-    color:"#04bbfa"
-  },
-  linkText:{
-    marginLeft: 10
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#cbd5e0",
+    marginVertical: 12,
   },
   button: {
-    marginTop: 10,
-    marginLeft: 250
+    width: "90%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    marginVertical: 12,
   },
-  btIcon:{
-    marginLeft:4
+  map: {
+    width: "90%",
+    height: 200,
+    borderRadius: 12,
+    marginVertical: 12,
   },
-  icon: {
-    color:"#554142"
+  link: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  linkText: {
+    marginLeft: 8,
+    color: "#2b6cb0",
+    fontSize: 16,
   },
 });

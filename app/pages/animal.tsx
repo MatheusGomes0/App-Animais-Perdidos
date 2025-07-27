@@ -1,22 +1,18 @@
 import { useState, useEffect } from "react";
 import { Button, ButtonIcon, ButtonText, Heading, Input, InputField } from "@gluestack-ui/themed";
-import { Text, StyleSheet, View, Image, Alert } from "react-native";
+import { Text, StyleSheet, View, Alert, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Link } from "expo-router";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { Disc3 } from "lucide-react-native";
-import axios from "axios"; // Importando axios para as requisições HTTP
+import axios from "axios";
 
 export default function Animal() {
-  // Estados para armazenar os valores dos inputs
   const [nome, setNome] = useState("");
   const [especie, setEspecie] = useState("");
   const [raca, setRaca] = useState("");
   const [enderecoDesaparecimento, setEnderecoDesaparecimento] = useState("");
-
-  // Estado para controlar se o botão está habilitado
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  // Verifica se todos os campos estão preenchidos
   useEffect(() => {
     if (nome && especie && raca && enderecoDesaparecimento) {
       setIsButtonDisabled(false);
@@ -25,7 +21,6 @@ export default function Animal() {
     }
   }, [nome, especie, raca, enderecoDesaparecimento]);
 
-  // Função para enviar os dados para a API
   const handleSubmit = async () => {
     try {
       await axios.post("http://localhost:3000/animais", {
@@ -33,132 +28,136 @@ export default function Animal() {
         especie,
         raca,
         endereco_desaparecimento: enderecoDesaparecimento,
-        status: false, // Definindo o status como false por padrão
+        status: false,
       });
 
-      // Exibe uma mensagem de sucesso
-      Alert.alert("Sucesso", "Dados gravados com sucesso!");
-
-      // Limpa o formulário
+      Alert.alert("Sucesso", "Animal cadastrado com sucesso!");
       setNome("");
       setEspecie("");
       setRaca("");
       setEnderecoDesaparecimento("");
-      setIsButtonDisabled(true); // Desabilita o botão novamente
-
+      setIsButtonDisabled(true);
     } catch (error) {
-      Alert.alert("Erro", "Ocorreu um erro ao gravar os dados.");
+      Alert.alert("Erro", "Ocorreu um erro ao cadastrar o animal.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require("../img/animal_perdido.png")} style={styles.backgroundImage} />
-      <Heading style={styles.heading}>Cadastro do animal</Heading>
-
-      <Text style={styles.text}>Nome:</Text>
-      
-      <Input style={styles.input} variant="outline" size="sm" mb={8} width={'78%'}>
-        <InputField value={nome} onChangeText={setNome} placeholder="" />
-      </Input>
-
-      <Text style={styles.text}>Espécie:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={'25%'}>
-        <InputField value={especie} onChangeText={setEspecie} placeholder="" />
-      </Input>
-
-      <Text style={styles.text}>Raça:</Text>
-
-      <Input style={styles.input} variant="outline" size="md" mb={8} width={"33%"}>
-        <InputField value={raca} onChangeText={setRaca} placeholder="" />
-      </Input>
-
-      <Text style={styles.text1}>Endereço do desaparecimento:</Text>
-
-      <Input style={styles.input1} variant="outline" size="md" mb={8} width={"90%"}>
-        <InputField value={enderecoDesaparecimento} onChangeText={setEnderecoDesaparecimento} placeholder="" />
-      </Input>
-
-      <Button
-        style={styles.button}
-        size="lg"
-        variant="solid"
-        action="primary"
-        onPress={handleSubmit}
-        isDisabled={isButtonDisabled} // Desabilita o botão enquanto o formulário estiver incompleto
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
       >
-        <ButtonText>Gravar</ButtonText>
-        <ButtonIcon style={styles.btIcon} as={Disc3} />
-      </Button>
+       <View style={styles.logoContainer}>
+       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}> Cadastrar Animal Perdido</Heading>
+       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      </View>
 
-      <Link style={styles.link} href="/home">
-        <AntDesign style={styles.icon} name="banckward" size={24} /> Voltar a Home
-      </Link>
-    </View>
+        <Text style={styles.label}>Nome</Text>
+        <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+          <InputField
+            value={nome}
+            onChangeText={setNome}
+            placeholder="Digite o nome do animal"
+          />
+        </Input>
+
+        <Text style={styles.label}>Espécie</Text>
+        <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+          <InputField
+            value={especie}
+            onChangeText={setEspecie}
+            placeholder="Ex: Gato, Cachorro"
+          />
+        </Input>
+
+        <Text style={styles.label}>Raça</Text>
+        <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+          <InputField
+            value={raca}
+            onChangeText={setRaca}
+            placeholder="Digite a raça"
+          />
+        </Input>
+
+        <Text style={styles.label}>Endereço do desaparecimento</Text>
+        <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+          <InputField
+            value={enderecoDesaparecimento}
+            onChangeText={setEnderecoDesaparecimento}
+            placeholder="Digite o endereço ou ponto de referência"
+          />
+        </Input>
+
+        <Button
+          style={styles.button}
+          size="lg"
+          variant="solid"
+          action="primary"
+          onPress={handleSubmit}
+          isDisabled={isButtonDisabled}
+        >
+          <ButtonText>Cadastrar</ButtonText>
+          <ButtonIcon as={Disc3} />
+        </Button>
+
+        <Link style={styles.link} href="/home">
+          <AntDesign name="arrowleft" size={20} color="#3182ce" /> Voltar para Home
+        </Link>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignContent: "flex-start",
-  },
-  backgroundImage: {
-    resizeMode: "cover",
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "60%",
-    opacity: 0.6,
-    marginTop: 150,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    backgroundColor: "#f5f7fa",
   },
-  text: {
-    marginTop: 90,
-    marginLeft: 20,
-    color: "blue",
-  },
-  text1: {
-    marginTop: 90,
-    marginLeft: 80,
-    color: "blue",
-  },
-  input: {
-    marginTop: 90,
-    marginLeft: 10,
-    backgroundColor: "#cdcccc",
-    opacity: 0.7,
-  },
-  input1: {
-    marginTop: 5,
-    marginLeft: 10,
-    backgroundColor: "#cdcccc",
-    opacity: 0.7,
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 30,
   },
   heading: {
-    marginTop: 90,
-    marginLeft: 100,
-    marginRight: 100,
+    fontSize: 25,
     color: "#165a72",
+    marginBottom: 15,
+    textAlign: "center",
+    marginTop: 30,
   },
-  link: {
-    marginTop: 200,
+  label: {
+    alignSelf: "flex-start",
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 4,
     marginLeft: 10,
-    color: "#04bbfa",
+    fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#cbd5e0",
   },
   button: {
-    marginTop: 10,
-    marginLeft: 250,
+    marginTop: 20,
+    width: "90%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
   },
-  btIcon: {
-    marginLeft: 4,
-  },
-  icon: {
-    color: "#554142",
+  link: {
+    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    color: "#2b6cb0",
   },
 });
