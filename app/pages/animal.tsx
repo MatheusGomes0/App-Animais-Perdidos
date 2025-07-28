@@ -1,100 +1,76 @@
 import { useState, useEffect } from "react";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, ButtonIcon, ButtonText, Heading, Input, InputField } from "@gluestack-ui/themed";
-import { Text, StyleSheet, View, Alert, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { Link } from "expo-router";
 import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { Disc3 } from "lucide-react-native";
-import axios from "axios";
+import { Link } from "expo-router";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../database/firebaseConfig"; 
 
 export default function Animal() {
   const [nome, setNome] = useState("");
   const [especie, setEspecie] = useState("");
   const [raca, setRaca] = useState("");
-  const [cor, setCor] = useState(""); // <-- Novo estado para cor
+  const [cor, setCor] = useState("");
   const [enderecoDesaparecimento, setEnderecoDesaparecimento] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
-    if (nome && especie && raca && cor && enderecoDesaparecimento) {
-      setIsButtonDisabled(false);
-    } else {
-      setIsButtonDisabled(true);
-    }
+    setIsButtonDisabled(!(nome && especie && raca && cor && enderecoDesaparecimento));
   }, [nome, especie, raca, cor, enderecoDesaparecimento]);
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:3000/animais", {
+      await addDoc(collection(db, "animais"), {
         nome,
         especie,
         raca,
-        cor,  // <-- Enviando cor na requisição
-        endereco_desaparecimento: enderecoDesaparecimento,
+        cor,
+        endereco: enderecoDesaparecimento,
         status: false,
+        criado_em: new Date()
       });
 
       Alert.alert("Sucesso", "Animal cadastrado com sucesso!");
       setNome("");
       setEspecie("");
       setRaca("");
-      setCor(""); // <-- Limpa o campo cor
+      setCor("");
       setEnderecoDesaparecimento("");
       setIsButtonDisabled(true);
     } catch (error) {
+      console.error("Erro ao cadastrar:", error);
       Alert.alert("Erro", "Ocorreu um erro ao cadastrar o animal.");
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-       <View style={styles.logoContainer}>
-       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
-        <Heading style={styles.heading}> Cadastrar Animal Perdido</Heading>
-       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
-      </View>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.logoContainer}>
+          <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+          <Heading style={styles.heading}>Cadastrar Animal Perdido</Heading>
+          <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        </View>
 
         <Text style={styles.label}>Nome</Text>
         <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-          <InputField
-            value={nome}
-            onChangeText={setNome}
-            placeholder="Digite o nome do animal"
-          />
+          <InputField value={nome} onChangeText={setNome} placeholder="Digite o nome do animal" />
         </Input>
 
         <Text style={styles.label}>Espécie</Text>
         <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-          <InputField
-            value={especie}
-            onChangeText={setEspecie}
-            placeholder="Ex: Gato, Cachorro"
-          />
+          <InputField value={especie} onChangeText={setEspecie} placeholder="Ex: Gato, Cachorro" />
         </Input>
 
         <Text style={styles.label}>Raça</Text>
         <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-          <InputField
-            value={raca}
-            onChangeText={setRaca}
-            placeholder="Digite a raça"
-          />
+          <InputField value={raca} onChangeText={setRaca} placeholder="Digite a raça" />
         </Input>
 
-        {/* Novo campo Cor */}
         <Text style={styles.label}>Cor</Text>
         <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-          <InputField
-            value={cor}
-            onChangeText={setCor}
-            placeholder="Digite a cor do animal"
-          />
+          <InputField value={cor} onChangeText={setCor} placeholder="Digite a cor do animal" />
         </Input>
 
         <Text style={styles.label}>Endereço do desaparecimento</Text>

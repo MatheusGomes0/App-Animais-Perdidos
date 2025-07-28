@@ -4,11 +4,23 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../database/firebaseConfig"; // ajuste esse caminho se necessário
+
+type Animal = {
+  id: string;
+  nome: string;
+  endereco: string;
+  lat: number;
+  lon: number;
+};
 
 export default function Localizar() {
   const router = useRouter();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [animais, setAnimais] = useState<Animal[]>([]);
+  const [loadingAnimais, setLoadingAnimais] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -24,6 +36,47 @@ export default function Localizar() {
     })();
   }, []);
 
+  useEffect(() => {
+    const carregarAnimais = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "animais"));
+        const animaisData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as any[];
+
+        const animaisComCoords: Animal[] = [];
+
+        for (const animal of animaisData) {
+          if (!animal.endereco) continue;
+
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(animal.endereco)}`
+          );
+          const geoData = await geoRes.json();
+
+          if (geoData && geoData.length > 0) {
+            animaisComCoords.push({
+              id: animal.id,
+              nome: animal.nome || "Animal",
+              endereco: animal.endereco,
+              lat: parseFloat(geoData[0].lat),
+              lon: parseFloat(geoData[0].lon),
+            });
+          }
+        }
+
+        setAnimais(animaisComCoords);
+        setLoadingAnimais(false);
+      } catch (error) {
+        console.error("Erro ao carregar animais:", error);
+        setLoadingAnimais(false);
+      }
+    };
+
+    carregarAnimais();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -36,7 +89,7 @@ export default function Localizar() {
         Toque no alfinete no mapa para visualizar os detalhes do animal.
       </Text>
 
-      {!location ? (
+      {!location || loadingAnimais ? (
         <ActivityIndicator size="large" color="#2b6cb0" />
       ) : (
         <MapView
@@ -44,18 +97,31 @@ export default function Localizar() {
           initialRegion={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
           }}
         >
+          {/* Localização do usuário */}
           <Marker
             coordinate={{
-              latitude: -23.085753916419584,
-              longitude: -47.20261698956988,
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
             }}
-            image={require("../img/tach_blue.png")}
-            onPress={() => router.push("/pages/detalhes")}
+            title="Você está aqui"
+            pinColor="blue"
           />
+
+          {/* Animais do Firestore */}
+          {animais.map(animal => (
+            <Marker
+              key={animal.id}
+              coordinate={{ latitude: animal.lat, longitude: animal.lon }}
+              title={animal.nome}
+              description={animal.endereco}
+              image={require("../img/tach_blue.png")}
+              onPress={() => router.push(`/pages/detalhes`)} // adicionar id do animal para ir aos detalhes
+            />
+          ))}
         </MapView>
       )}
 

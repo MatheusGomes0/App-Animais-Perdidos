@@ -10,7 +10,7 @@ import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 export default function Home() {
   const auth = useAuth();
 
-  const handleDono = () => router.push("../../pages/editar_dono");
+  const handleDono = () => router.push("../../pages/editar_usuario");
   const handleAnimal = () => router.push("../../pages/animal");
   const handleEditarAnimal = () => router.push("../../pages/editar_animal")
   const handleLocalizacao = () => router.push("../../pages/localizar");
@@ -33,7 +33,7 @@ export default function Home() {
           action="primary"
         >
           <ButtonIcon as={PenLine} />
-          <Text style={styles.buttonText}>Editar dados do dono</Text>
+          <Text style={styles.buttonText}>Editar dados de usuario</Text>
         </Button>
 
         <Button

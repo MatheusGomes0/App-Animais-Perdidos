@@ -11,7 +11,8 @@ import { Text, StyleSheet, View, Alert, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { Disc3 } from "lucide-react-native";
-import axios from "axios";
+import { collection, doc, setDoc } from "firebase/firestore";  
+import { db } from "../database/firebaseConfig";
 
 export default function Dono() {
   const [nome, setNome] = useState("");
@@ -26,16 +27,7 @@ export default function Dono() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
-    if (
-      nome &&
-      cpf &&
-      endereco &&
-      bairro &&
-      cidade &&
-      estado &&
-      telefone &&
-      email
-    ) {
+    if (nome && cpf && endereco && bairro && cidade && estado && telefone && email) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
@@ -44,7 +36,8 @@ export default function Dono() {
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:3000/donos", {
+      // Usa o CPF como ID do documento
+      await setDoc(doc(db, "usuarios", cpf), {
         nome,
         cpf,
         endereco,
@@ -67,6 +60,7 @@ export default function Dono() {
       setEmail("");
       setIsButtonDisabled(true);
     } catch (error) {
+      console.error("Erro ao cadastrar:", error);
       Alert.alert("Erro", "Ocorreu um erro ao gravar os dados.");
     }
   };
@@ -75,108 +69,41 @@ export default function Dono() {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.logoContainer}>
         <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
-        <Heading style={styles.heading}>  Cadastro</Heading>
+        <Heading style={styles.heading}> Cadastro</Heading>
         <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
       </View>
 
-      {/* Campo Nome */}
+      {/* Campos de entrada */}
       <Text style={styles.label}>Nome:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={nome}
-          onChangeText={setNome}
-          placeholder="Digite seu nome"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={nome} onChangeText={setNome} placeholder="Digite seu nome" /></Input>
 
-      {/* Campo CPF */}
       <Text style={styles.label}>CPF:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={cpf}
-          onChangeText={(text) => setCpf(text.replace(/[^0-9]/g, "").slice(0, 11))}
-          placeholder="Digite seu CPF"
-          keyboardType="numeric"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={cpf} onChangeText={(text) => setCpf(text.replace(/[^0-9]/g, "").slice(0, 11))} placeholder="Digite seu CPF" keyboardType="numeric" /></Input>
 
-      {/* Campo Endereço */}
       <Text style={styles.label}>Endereço:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={endereco}
-          onChangeText={setEndereco}
-          placeholder="Digite seu endereço"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={endereco} onChangeText={setEndereco} placeholder="Rua e número" /></Input>
 
-      {/* Campo Bairro */}
       <Text style={styles.label}>Bairro:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={bairro}
-          onChangeText={setBairro}
-          placeholder="Digite seu bairro"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={bairro} onChangeText={setBairro} placeholder="Digite seu bairro" /></Input>
 
-      {/* Cidade e Estado lado a lado */}
       <View style={styles.row}>
         <View style={styles.cityContainer}>
           <Text style={styles.label}>Cidade:</Text>
-          <Input style={styles.input} variant="outline" size="md" width="100%">
-            <InputField
-              value={cidade}
-              onChangeText={setCidade}
-              placeholder="Digite sua cidade"
-            />
-          </Input>
+          <Input style={styles.input}><InputField value={cidade} onChangeText={setCidade} placeholder="Digite sua cidade" /></Input>
         </View>
-
         <View style={styles.stateContainer}>
           <Text style={styles.label}>Estado:</Text>
-          <Input style={styles.input} variant="outline" size="md" width="100%">
-            <InputField
-              value={estado}
-              onChangeText={setEstado}
-              placeholder="UF"
-              maxLength={2}
-            />
-          </Input>
+          <Input style={styles.input}><InputField value={estado} onChangeText={setEstado} placeholder="UF" maxLength={2} /></Input>
         </View>
       </View>
 
-      {/* Campo Telefone */}
       <Text style={styles.label}>Telefone:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={telefone}
-          onChangeText={setTelefone}
-          placeholder="(XX) XXXXX-XXXX"
-          keyboardType="phone-pad"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={telefone} onChangeText={setTelefone} placeholder="(XX) XXXXX-XXXX" keyboardType="phone-pad" /></Input>
 
-      {/* Campo Email */}
       <Text style={styles.label}>E-mail:</Text>
-      <Input style={styles.input} variant="outline" size="md" width="100%">
-        <InputField
-          value={email}
-          onChangeText={setEmail}
-          placeholder="seu@email.com"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </Input>
+      <Input style={styles.input}><InputField value={email} onChangeText={setEmail} placeholder="seu@email.com" keyboardType="email-address" autoCapitalize="none" /></Input>
 
-      <Button
-        style={styles.button}
-        size="lg"
-        variant="solid"
-        action="primary"
-        onPress={handleSubmit}
-        isDisabled={isButtonDisabled}
-      >
+      <Button style={styles.button} onPress={handleSubmit} isDisabled={isButtonDisabled}>
         <ButtonText>Registrar-se</ButtonText>
         <ButtonIcon style={styles.btIcon} as={Disc3} />
       </Button>
@@ -189,6 +116,7 @@ export default function Dono() {
   );
 }
 
+// Seus estilos permanecem os mesmos
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
