@@ -1,10 +1,28 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 export default function Localizar() {
   const router = useRouter();
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setErrorMsg("Permissão de localização negada.");
+        return;
+      }
+
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -18,26 +36,29 @@ export default function Localizar() {
         Toque no alfinete no mapa para visualizar os detalhes do animal.
       </Text>
 
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: -23.085753916419584,
-          longitude: -47.20261698956988,
-          latitudeDelta: 0.0018,
-          longitudeDelta: 0.0018,
-        }}
-      >
-        <Marker
-          coordinate={{
-            latitude: -23.085753916419584,
-            longitude: -47.20261698956988,
+      {!location ? (
+        <ActivityIndicator size="large" color="#2b6cb0" />
+      ) : (
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
           }}
-          image={require('../img/tach_blue.png')}
-          onPress={() => router.push("/detalhes")}
-        />
-      </MapView>
+        >
+          <Marker
+            coordinate={{
+              latitude: -23.085753916419584,
+              longitude: -47.20261698956988,
+            }}
+            image={require("../img/tach_blue.png")}
+            onPress={() => router.push("/detalhes")}
+          />
+        </MapView>
+      )}
 
-      {/* Botão voltar à Home */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.push("/home")}>
         <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
         <Text style={styles.backButtonText}>Voltar à Home</Text>
@@ -61,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 34,
     fontWeight: "bold",
     color: "#165a72",
     marginHorizontal: 8,

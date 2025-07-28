@@ -12,18 +12,40 @@ import {
   Input,
   InputField,
 } from "@gluestack-ui/themed";
-import { Text, StyleSheet, View, Image } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 import { Link } from "expo-router";
-import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
-import MapView, { Circle, Marker } from 'react-native-maps';
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import MapView, { Circle, Marker } from "react-native-maps";
 import { HeartHandshake } from "lucide-react-native";
-
+import { Picker } from "@react-native-picker/picker";
 
 export default function Situacao() {
-
   const [isSecondCheckBoxChecked, setIsSecondCheckBoxChecked] = useState(true);
   const [isFirstCheckBoxChecked, setIsFirstCheckBoxChecked] = useState(false);
   const [isInputEnable, setInputEnable] = useState(false);
+
+  const animais = [
+    {
+      id: "1",
+      nome: "Rex",
+      endereco: "Rua Themistocles Zoppi, 110 - Jd Santiago",
+      latitude: -23.094925761593053,
+      longitude: -47.19621286287202,
+    },
+    {
+      id: "2",
+      nome: "Mimi",
+      endereco: "Av. Brasil, 500 - Centro",
+      latitude: -23.0955,
+      longitude: -47.1955,
+    },
+  ];
+
+  // Armazenar apenas o ID selecionado
+  const [animalSelecionadoId, setAnimalSelecionadoId] = useState("1");
+
+  // Buscar animal selecionado com base no ID
+  const animalSelecionado = animais.find((a) => a.id === animalSelecionadoId)!;
 
   const handleSecondCheckBoxChange = () => {
     const newValue = !isSecondCheckBoxChecked;
@@ -45,15 +67,32 @@ export default function Situacao() {
 
   return (
     <View style={styles.container}>
-
-        <View style={styles.logoContainer}>
-       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
-        <Heading style={styles.heading}>  Status da Busca</Heading>
-       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      <View style={styles.logoContainer}>
+        <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}>  Alterar Status</Heading>
+        <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
       </View>
 
-      <Text style={styles.petName}>🐶 Rex</Text>
-      <Text style={styles.address}>Rua Themistocles Zoppi, 110 - Jd Santiago</Text>
+      {/* Picker para selecionar o animal */}
+      <View style={styles.pickerContainer}>
+  <Picker
+    selectedValue={animalSelecionadoId}
+    onValueChange={(itemValue) => setAnimalSelecionadoId(itemValue)}
+    style={styles.picker}
+    dropdownIconColor="#2b6cb0" // Adicione para visibilidade do ícone
+  >
+    {animais.map((animal) => (
+      <Picker.Item 
+        key={animal.id} 
+        label={animal.nome} 
+        value={animal.id} 
+      />
+    ))}
+  </Picker>
+</View>
+
+      <Text style={styles.petName}>🐶 {animalSelecionado.nome}</Text>
+      <Text style={styles.address}>{animalSelecionado.endereco}</Text>
 
       <View style={styles.checkGroup}>
         <Checkbox
@@ -90,42 +129,37 @@ export default function Situacao() {
         variant="outline"
         size="md"
         mb={8}
-        width={'90%'}
+        width={"90%"}
         isDisabled={!isInputEnable}
       >
         <InputField placeholder="Observações (opcional)" />
       </Input>
 
-      <Button
-        style={styles.button}
-        size="lg"
-        variant="solid"
-        action="primary"
-      >
-        <ButtonText>Mudar Status </ButtonText>
+      <Button style={styles.button} size="lg" variant="solid" action="primary">
+        <ButtonText>Mudar Status</ButtonText>
         <ButtonIcon as={HeartHandshake} />
       </Button>
 
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: -23.094925761593053,
-          longitude: -47.19621286287202,
-          latitudeDelta: 0.0020,
-          longitudeDelta: 0.0020,
+          latitude: animalSelecionado.latitude,
+          longitude: animalSelecionado.longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
         }}
       >
         <Marker
           coordinate={{
-            latitude: -23.094925761593053,
-            longitude: -47.19621286287202,
+            latitude: animalSelecionado.latitude,
+            longitude: animalSelecionado.longitude,
           }}
-          image={require('../img/tach_red.png')}
+          image={require("../img/tach_red.png")}
         />
         <Circle
           center={{
-            latitude: -23.094925761593053,
-            longitude: -47.19621286287202,
+            latitude: animalSelecionado.latitude,
+            longitude: animalSelecionado.longitude,
           }}
           radius={80}
           strokeColor="red"
@@ -151,7 +185,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
-   logoContainer: {
+  logoContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
@@ -163,6 +197,19 @@ const styles = StyleSheet.create({
     marginBottom: 1,
     textAlign: "center",
   },
+  pickerContainer: {
+    width: "90%",
+    borderWidth: 1,
+    borderColor: "#cbd5e0",
+    borderRadius: 8,
+    marginVertical: 10,
+    backgroundColor: "#fff",
+  },
+  picker: {
+  height: 44,
+  width: "100%",
+  color: "#000", // Garante visibilidade do texto
+},
   petName: {
     fontSize: 22,
     fontWeight: "bold",

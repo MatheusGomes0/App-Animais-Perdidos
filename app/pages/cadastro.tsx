@@ -15,7 +15,7 @@ import axios from "axios";
 
 export default function Dono() {
   const [nome, setNome] = useState("");
-  const [sobrenome, setSobrenome] = useState("");
+  const [cpf, setCpf] = useState("");
   const [endereco, setEndereco] = useState("");
   const [bairro, setBairro] = useState("");
   const [cidade, setCidade] = useState("");
@@ -28,7 +28,7 @@ export default function Dono() {
   useEffect(() => {
     if (
       nome &&
-      sobrenome &&
+      cpf &&
       endereco &&
       bairro &&
       cidade &&
@@ -40,13 +40,13 @@ export default function Dono() {
     } else {
       setIsButtonDisabled(true);
     }
-  }, [nome, sobrenome, endereco, bairro, cidade, estado, telefone, email]);
+  }, [nome, cpf, endereco, bairro, cidade, estado, telefone, email]);
 
   const handleSubmit = async () => {
     try {
       await axios.post("http://localhost:3000/donos", {
         nome,
-        sobrenome,
+        cpf,
         endereco,
         bairro,
         cidade,
@@ -58,7 +58,7 @@ export default function Dono() {
       Alert.alert("Sucesso", "Dados gravados com sucesso!");
 
       setNome("");
-      setSobrenome("");
+      setCpf("");
       setEndereco("");
       setBairro("");
       setCidade("");
@@ -73,14 +73,11 @@ export default function Dono() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
-
       <View style={styles.logoContainer}>
-       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
         <Heading style={styles.heading}>  Cadastro</Heading>
-       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
       </View>
-
 
       {/* Campo Nome */}
       <Text style={styles.label}>Nome:</Text>
@@ -92,13 +89,14 @@ export default function Dono() {
         />
       </Input>
 
-      {/* Campo Sobrenome */}
-      <Text style={styles.label}>Sobrenome:</Text>
+      {/* Campo CPF */}
+      <Text style={styles.label}>CPF:</Text>
       <Input style={styles.input} variant="outline" size="md" width="100%">
         <InputField
-          value={sobrenome}
-          onChangeText={setSobrenome}
-          placeholder="Digite seu sobrenome"
+          value={cpf}
+          onChangeText={(text) => setCpf(text.replace(/[^0-9]/g, "").slice(0, 11))}
+          placeholder="Digite seu CPF"
+          keyboardType="numeric"
         />
       </Input>
 
@@ -148,7 +146,7 @@ export default function Dono() {
         </View>
       </View>
 
-      {/* Campo Telefone embaixo de Cidade/Estado */}
+      {/* Campo Telefone */}
       <Text style={styles.label}>Telefone:</Text>
       <Input style={styles.input} variant="outline" size="md" width="100%">
         <InputField
@@ -209,7 +207,7 @@ const styles = StyleSheet.create({
     color: "#165a72",
     fontWeight: "bold",
     marginBottom: 10,
-    marginTop: 10, // título um pouco mais para baixo
+    marginTop: 10,
     textAlign: "center",
   },
   label: {
@@ -244,8 +242,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2b6cb0",
     borderRadius: 8,
     flexDirection: "row",
-    alignItems: "center", // centraliza verticalmente
-    justifyContent: "center", // centraliza horizontalmente (texto e ícone)
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 14,
     marginTop: 20,
   },

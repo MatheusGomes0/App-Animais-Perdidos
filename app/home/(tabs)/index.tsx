@@ -12,6 +12,7 @@ export default function Home() {
 
   const handleDono = () => router.push("../../pages/dono");
   const handleAnimal = () => router.push("../../pages/animal");
+  const handleEditarAnimal = () => router.push("../../pages/editar_animal")
   const handleLocalizacao = () => router.push("../../pages/localizar");
   const handleSituacao = () => router.push("../../pages/situacao");
 
@@ -32,7 +33,7 @@ export default function Home() {
           action="primary"
         >
           <ButtonIcon as={PenLine} />
-          <Text style={styles.buttonText}>Cadastro do dono</Text>
+          <Text style={styles.buttonText}>Editar dados do dono</Text>
         </Button>
 
         <Button
@@ -48,13 +49,24 @@ export default function Home() {
 
         <Button
           style={styles.button}
+          onPress={handleEditarAnimal}
+          size="lg"
+          variant="solid"
+          action="primary"
+        >
+          <ButtonIcon as={PenLine} />
+          <Text style={styles.buttonText}>Editar dados do animal</Text>
+        </Button>
+
+        <Button
+          style={styles.button}
           onPress={handleSituacao}
           size="lg"
           variant="solid"
           action="primary"
         >
           <ButtonIcon as={Dog} />
-          <Text style={styles.buttonText}>Consulta situação</Text>
+          <Text style={styles.buttonText}>Alterar situação</Text>
         </Button>
 
         <Button

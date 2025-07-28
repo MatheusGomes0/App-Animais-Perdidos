@@ -15,7 +15,7 @@ import axios from "axios";
 
 export default function Dono() {
   const [nome, setNome] = useState("");
-  const [sobrenome, setSobrenome] = useState("");
+  const [cpf, setCpf] = useState("");
   const [endereco, setEndereco] = useState("");
   const [bairro, setBairro] = useState("");
   const [cidade, setCidade] = useState("");
@@ -28,7 +28,7 @@ export default function Dono() {
   useEffect(() => {
     if (
       nome &&
-      sobrenome &&
+      cpf &&
       endereco &&
       bairro &&
       cidade &&
@@ -40,13 +40,13 @@ export default function Dono() {
     } else {
       setIsButtonDisabled(true);
     }
-  }, [nome, sobrenome, endereco, bairro, cidade, estado, telefone, email]);
+  }, [nome, cpf, endereco, bairro, cidade, estado, telefone, email]);
 
   const handleSubmit = async () => {
     try {
       await axios.post("http://localhost:3000/donos", {
         nome,
-        sobrenome,
+        cpf,
         endereco,
         bairro,
         cidade,
@@ -55,10 +55,10 @@ export default function Dono() {
         email,
       });
 
-      Alert.alert("Sucesso", "Dados gravados com sucesso!");
+      Alert.alert("Sucesso", "Dados editados com sucesso!");
 
       setNome("");
-      setSobrenome("");
+      setCpf("");
       setEndereco("");
       setBairro("");
       setCidade("");
@@ -73,14 +73,11 @@ export default function Dono() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
-
       <View style={styles.logoContainer}>
-       <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
-        <Heading style={styles.heading}> Dados do Dono</Heading>
-       <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}>  Editar dados</Heading>
+        <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
       </View>
-
 
       {/* Campo Nome */}
       <Text style={styles.label}>Nome:</Text>
@@ -88,17 +85,18 @@ export default function Dono() {
         <InputField
           value={nome}
           onChangeText={setNome}
-          placeholder="Digite seu nome"
+          placeholder="Nome"
         />
       </Input>
 
-      {/* Campo Sobrenome */}
-      <Text style={styles.label}>Sobrenome:</Text>
+      {/* Campo CPF */}
+      <Text style={styles.label}>CPF:</Text>
       <Input style={styles.input} variant="outline" size="md" width="100%">
         <InputField
-          value={sobrenome}
-          onChangeText={setSobrenome}
-          placeholder="Digite seu sobrenome"
+          value={cpf}
+          editable={false} //usuario nao pode editar o CPF do cadastro
+          placeholder="CPF"
+          keyboardType="numeric"
         />
       </Input>
 
@@ -108,7 +106,7 @@ export default function Dono() {
         <InputField
           value={endereco}
           onChangeText={setEndereco}
-          placeholder="Digite seu endereço"
+          placeholder="Endereço"
         />
       </Input>
 
@@ -118,7 +116,7 @@ export default function Dono() {
         <InputField
           value={bairro}
           onChangeText={setBairro}
-          placeholder="Digite seu bairro"
+          placeholder="Bairro"
         />
       </Input>
 
@@ -130,7 +128,7 @@ export default function Dono() {
             <InputField
               value={cidade}
               onChangeText={setCidade}
-              placeholder="Digite sua cidade"
+              placeholder="Cidade"
             />
           </Input>
         </View>
@@ -148,7 +146,7 @@ export default function Dono() {
         </View>
       </View>
 
-      {/* Campo Telefone embaixo de Cidade/Estado */}
+      {/* Campo Telefone */}
       <Text style={styles.label}>Telefone:</Text>
       <Input style={styles.input} variant="outline" size="md" width="100%">
         <InputField
@@ -183,9 +181,9 @@ export default function Dono() {
         <ButtonIcon style={styles.btIcon} as={Disc3} />
       </Button>
 
-      <Link style={styles.link} href="/home">
+      <Link style={styles.link} href="/">
         <AntDesign name="arrowleft" size={24} color="#2b6cb0" />
-        <Text style={styles.linkText}> Voltar à Home</Text>
+        <Text style={styles.linkText}> Voltar ao Login</Text>
       </Link>
     </ScrollView>
   );
@@ -201,14 +199,15 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 10,
+    marginTop: 20,
   },
   heading: {
     fontSize: 28,
     color: "#165a72",
     fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 30, // título um pouco mais para baixo
+    marginBottom: 10,
+    marginTop: 10,
     textAlign: "center",
   },
   label: {
@@ -243,8 +242,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2b6cb0",
     borderRadius: 8,
     flexDirection: "row",
-    alignItems: "center", // centraliza verticalmente
-    justifyContent: "center", // centraliza horizontalmente (texto e ícone)
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 14,
     marginTop: 20,
   },

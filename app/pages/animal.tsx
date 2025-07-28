@@ -10,16 +10,17 @@ export default function Animal() {
   const [nome, setNome] = useState("");
   const [especie, setEspecie] = useState("");
   const [raca, setRaca] = useState("");
+  const [cor, setCor] = useState(""); // <-- Novo estado para cor
   const [enderecoDesaparecimento, setEnderecoDesaparecimento] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
-    if (nome && especie && raca && enderecoDesaparecimento) {
+    if (nome && especie && raca && cor && enderecoDesaparecimento) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [nome, especie, raca, enderecoDesaparecimento]);
+  }, [nome, especie, raca, cor, enderecoDesaparecimento]);
 
   const handleSubmit = async () => {
     try {
@@ -27,6 +28,7 @@ export default function Animal() {
         nome,
         especie,
         raca,
+        cor,  // <-- Enviando cor na requisição
         endereco_desaparecimento: enderecoDesaparecimento,
         status: false,
       });
@@ -35,6 +37,7 @@ export default function Animal() {
       setNome("");
       setEspecie("");
       setRaca("");
+      setCor(""); // <-- Limpa o campo cor
       setEnderecoDesaparecimento("");
       setIsButtonDisabled(true);
     } catch (error) {
@@ -81,6 +84,16 @@ export default function Animal() {
             value={raca}
             onChangeText={setRaca}
             placeholder="Digite a raça"
+          />
+        </Input>
+
+        {/* Novo campo Cor */}
+        <Text style={styles.label}>Cor</Text>
+        <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
+          <InputField
+            value={cor}
+            onChangeText={setCor}
+            placeholder="Digite a cor do animal"
           />
         </Input>
 
