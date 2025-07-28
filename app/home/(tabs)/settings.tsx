@@ -4,10 +4,6 @@ import { View, Text, StyleSheet, Image } from "react-native";
 export default function Settings() {
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../../img/animal_perdido.png")}
-        style={styles.backgroundImage}
-      />
       <Text>Settings</Text>
       <StatusBar style="auto" />
     </View>

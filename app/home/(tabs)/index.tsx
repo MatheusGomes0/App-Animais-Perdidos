@@ -10,7 +10,7 @@ import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 export default function Home() {
   const auth = useAuth();
 
-  const handleDono = () => router.push("../../pages/dono");
+  const handleDono = () => router.push("../../pages/editar_dono");
   const handleAnimal = () => router.push("../../pages/animal");
   const handleEditarAnimal = () => router.push("../../pages/editar_animal")
   const handleLocalizacao = () => router.push("../../pages/localizar");

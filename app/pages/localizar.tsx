@@ -54,7 +54,7 @@ export default function Localizar() {
               longitude: -47.20261698956988,
             }}
             image={require("../img/tach_blue.png")}
-            onPress={() => router.push("/detalhes")}
+            onPress={() => router.push("/pages/detalhes")}
           />
         </MapView>
       )}
