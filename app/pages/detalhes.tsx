@@ -20,9 +20,9 @@ export default function Detalhes() {
         <Text style={styles.label}><Text style={styles.labelBold}>Contato:</Text> (11) 91234-5678</Text>
         <Text style={styles.label}><Text style={styles.labelBold}>Nome do dono:</Text> Matheus</Text>
 
-        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/home")}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/pages/localizar")}>
           <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
-          <Text style={styles.backText}>Voltar à Home</Text>
+          <Text style={styles.backText}>Voltar</Text>
         </TouchableOpacity>
       </View>
     </View>

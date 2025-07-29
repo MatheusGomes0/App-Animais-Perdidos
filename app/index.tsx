@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { router } from "expo-router";
 import {
   Input,
@@ -9,10 +9,27 @@ import {
   ButtonText,
 } from "@gluestack-ui/themed";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../app/database/firebaseConfig";
 
 export default function Login() {
-  const handleLogin = () => {
-    router.push("/home");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      Alert.alert("Erro", "Por favor, preencha o e-mail e a senha.");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      router.push("/home");
+    } catch (error: any) {
+      console.error("Erro no login:", error);
+      Alert.alert("Erro ao fazer login", error.message || "Verifique suas credenciais.");
+    }
   };
 
   const handleCadastro = () => {
@@ -21,7 +38,6 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-
       <View style={styles.logoContainer}>
         <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginRight: 8 }} />
         <Text style={styles.logoText}>Where's my PET?</Text>
@@ -31,11 +47,21 @@ export default function Login() {
       <Text style={styles.heading}>Entrar no app</Text>
 
       <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-        <InputField placeholder="Digite o seu e-mail" keyboardType="email-address" />
+        <InputField
+          placeholder="Digite o seu e-mail"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
       </Input>
 
       <Input style={styles.input} variant="outline" size="md" mb={4} width={"90%"}>
-        <InputField placeholder="Digite sua senha" secureTextEntry />
+        <InputField
+          placeholder="Digite sua senha"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+        />
       </Input>
 
       <Button

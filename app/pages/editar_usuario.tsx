@@ -11,13 +11,13 @@ import { Text, StyleSheet, View, Alert, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { Disc3 } from "lucide-react-native";
-
-import { db } from "../database/firebaseConfig"; // ajuste o caminho conforme seu projeto
+import { getAuth } from "firebase/auth";
+import { db } from "../database/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function Dono() {
   const [nome, setNome] = useState("");
-  const [cpf, setCpf] = useState(""); 
+  const [cpf, setCpf] = useState("");
   const [endereco, setEndereco] = useState("");
   const [bairro, setBairro] = useState("");
   const [cidade, setCidade] = useState("");
@@ -29,30 +29,38 @@ export default function Dono() {
 
   // 🔹 Buscar dados do Firestore ao abrir
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       try {
-        const docRef = doc(db, "usuarios", cpf);
-        const docSnap = await getDoc(docRef);
+        const auth = getAuth();
+        const user = auth.currentUser;
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setNome(data.nome || "");
-          setEndereco(data.endereco || "");
-          setBairro(data.bairro || "");
-          setCidade(data.cidade || "");
-          setEstado(data.estado || "");
-          setTelefone(data.telefone || "");
-          setEmail(data.email || "");
-        } else {
-          console.log("Usuário não encontrado.");
+        if (user) {
+          const uid = user.uid;
+
+          const docRef = doc(db, "usuarios", uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setCpf(data.cpf || "");
+            setNome(data.nome || "");
+            setEndereco(data.endereco || "");
+            setBairro(data.bairro || "");
+            setCidade(data.cidade || "");
+            setEstado(data.estado || "");
+            setTelefone(data.telefone || "");
+            setEmail(data.email || "");
+          } else {
+            console.log("Documento do usuário não encontrado.");
+          }
         }
       } catch (error) {
         console.error("Erro ao buscar usuário:", error);
       }
     };
 
-    fetchData();
-  }, [cpf]);
+    fetchUserData();
+  }, []);
 
   // 🔹 Validação de campos para ativar botão
   useEffect(() => {
@@ -73,21 +81,26 @@ export default function Dono() {
   // 🔹 Atualizar dados no Firestore
   const handleSubmit = async () => {
     try {
-      await setDoc(doc(db, "usuarios", cpf), {
-        nome,
-        cpf,
-        endereco,
-        bairro,
-        cidade,
-        estado,
-        telefone,
-        email,
-      });
+      const auth = getAuth();
+      const user = auth.currentUser;
 
-      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+      if (user) {
+        await setDoc(doc(db, "usuarios", user.uid), {
+          nome,
+          cpf,
+          endereco,
+          bairro,
+          cidade,
+          estado,
+          telefone,
+          email,
+        });
+
+        Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+      }
     } catch (error) {
+      console.error("Erro ao salvar dados:", error);
       Alert.alert("Erro", "Ocorreu um erro ao salvar os dados.");
-      console.error("Erro:", error);
     }
   };
 
@@ -112,40 +125,68 @@ export default function Dono() {
 
       <Text style={styles.label}>Endereço:</Text>
       <Input style={styles.input}>
-        <InputField value={endereco} onChangeText={setEndereco} placeholder="Endereço" />
+        <InputField
+          value={endereco}
+          onChangeText={setEndereco}
+          placeholder="Endereço"
+        />
       </Input>
 
       <Text style={styles.label}>Bairro:</Text>
       <Input style={styles.input}>
-        <InputField value={bairro} onChangeText={setBairro} placeholder="Bairro" />
+        <InputField
+          value={bairro}
+          onChangeText={setBairro}
+          placeholder="Bairro"
+        />
       </Input>
 
       <View style={styles.row}>
         <View style={styles.cityContainer}>
           <Text style={styles.label}>Cidade:</Text>
           <Input style={styles.input}>
-            <InputField value={cidade} onChangeText={setCidade} placeholder="Cidade" />
+            <InputField
+              value={cidade}
+              onChangeText={setCidade}
+              placeholder="Cidade"
+            />
           </Input>
         </View>
         <View style={styles.stateContainer}>
           <Text style={styles.label}>Estado:</Text>
           <Input style={styles.input}>
-            <InputField value={estado} onChangeText={setEstado} placeholder="UF" />
+            <InputField
+              value={estado}
+              onChangeText={setEstado}
+              placeholder="UF"
+            />
           </Input>
         </View>
       </View>
 
       <Text style={styles.label}>Telefone:</Text>
       <Input style={styles.input}>
-        <InputField value={telefone} onChangeText={setTelefone} placeholder="Telefone" />
+        <InputField
+          value={telefone}
+          onChangeText={setTelefone}
+          placeholder="Telefone"
+        />
       </Input>
 
       <Text style={styles.label}>Email:</Text>
       <Input style={styles.input}>
-        <InputField value={email} onChangeText={setEmail} placeholder="Email" />
+        <InputField
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+        />
       </Input>
 
-      <Button style={styles.button} onPress={handleSubmit} isDisabled={isButtonDisabled}>
+      <Button
+        style={styles.button}
+        onPress={handleSubmit}
+        isDisabled={isButtonDisabled}
+      >
         <ButtonText>Editar</ButtonText>
         <ButtonIcon as={Disc3} />
       </Button>
@@ -158,7 +199,7 @@ export default function Dono() {
   );
 }
 
-// ❗️ Estilos (sem alteração)
+// ❗️ Estilos
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,

@@ -1,11 +1,27 @@
 import { useState, useEffect } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Button, ButtonIcon, ButtonText, Heading, Input, InputField } from "@gluestack-ui/themed";
-import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import {
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Heading,
+  Input,
+  InputField,
+} from "@gluestack-ui/themed";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { Disc3 } from "lucide-react-native";
 import { Link } from "expo-router";
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "../database/firebaseConfig"; 
+import { db } from "../database/firebaseConfig";
+import { getAuth } from "firebase/auth"; // Importa auth
 
 export default function Animal() {
   const [nome, setNome] = useState("");
@@ -21,6 +37,15 @@ export default function Animal() {
 
   const handleSubmit = async () => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert("Erro", "Usuário não autenticado.");
+        return;
+      }
+
+      // Cadastra o animal com o ID do usuário logado
       await addDoc(collection(db, "animais"), {
         nome,
         especie,
@@ -28,10 +53,13 @@ export default function Animal() {
         cor,
         endereco: enderecoDesaparecimento,
         status: false,
-        criado_em: new Date()
+        criado_em: new Date(),
+        donoId: user.uid, // Associa corretamente ao usuário autenticado
       });
 
       Alert.alert("Sucesso", "Animal cadastrado com sucesso!");
+
+      // Limpa os campos após salvar
       setNome("");
       setEspecie("");
       setRaca("");
@@ -45,7 +73,10 @@ export default function Animal() {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.logoContainer}>
           <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
