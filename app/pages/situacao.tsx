@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   ButtonIcon,
@@ -11,41 +11,54 @@ import {
   Heading,
   Input,
   InputField,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectItem,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
 } from "@gluestack-ui/themed";
 import { Text, StyleSheet, View } from "react-native";
 import { Link } from "expo-router";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import MapView, { Circle, Marker } from "react-native-maps";
-import { HeartHandshake } from "lucide-react-native";
-import { Picker } from "@react-native-picker/picker";
+import { HeartHandshake, ChevronDown } from "lucide-react-native";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../database/firebaseConfig";
 
 export default function Situacao() {
   const [isSecondCheckBoxChecked, setIsSecondCheckBoxChecked] = useState(true);
   const [isFirstCheckBoxChecked, setIsFirstCheckBoxChecked] = useState(false);
   const [isInputEnable, setInputEnable] = useState(false);
 
-  const animais = [
-    {
-      id: "1",
-      nome: "Rex",
-      endereco: "Rua Themistocles Zoppi, 110 - Jd Santiago",
-      latitude: -23.094925761593053,
-      longitude: -47.19621286287202,
-    },
-    {
-      id: "2",
-      nome: "Mimi",
-      endereco: "Av. Brasil, 500 - Centro",
-      latitude: -23.0955,
-      longitude: -47.1955,
-    },
-  ];
+  const [animais, setAnimais] = useState<any[]>([]);
+  const [animalSelecionadoId, setAnimalSelecionadoId] = useState<string>("");
 
-  // Armazenar apenas o ID selecionado
-  const [animalSelecionadoId, setAnimalSelecionadoId] = useState("1");
+  useEffect(() => {
+    const buscarAnimais = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "animais"));
+        const listaAnimais: any[] = [];
+        querySnapshot.forEach((doc) => {
+          listaAnimais.push({ id: doc.id, ...doc.data() });
+        });
+        setAnimais(listaAnimais);
+        if (listaAnimais.length > 0) {
+          setAnimalSelecionadoId(listaAnimais[0].id);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar animais:", error);
+      }
+    };
 
-  // Buscar animal selecionado com base no ID
-  const animalSelecionado = animais.find((a) => a.id === animalSelecionadoId)!;
+    buscarAnimais();
+  }, []);
+
+  const animalSelecionado = animais.find((a) => a.id === animalSelecionadoId);
 
   const handleSecondCheckBoxChange = () => {
     const newValue = !isSecondCheckBoxChecked;
@@ -73,100 +86,106 @@ export default function Situacao() {
         <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
       </View>
 
-      {/* Picker para selecionar o animal */}
       <View style={styles.pickerContainer}>
-  <Picker
-    selectedValue={animalSelecionadoId}
-    onValueChange={(itemValue) => setAnimalSelecionadoId(itemValue)}
-    style={styles.picker}
-    dropdownIconColor="#2b6cb0" // Adicione para visibilidade do ícone
-  >
-    {animais.map((animal) => (
-      <Picker.Item 
-        key={animal.id} 
-        label={animal.nome} 
-        value={animal.id} 
-      />
-    ))}
-  </Picker>
-</View>
-
-      <Text style={styles.petName}>🐶 {animalSelecionado.nome}</Text>
-      <Text style={styles.address}>{animalSelecionado.endereco}</Text>
-
-      <View style={styles.checkGroup}>
-        <Checkbox
-          size="md"
-          isDisabled={isSecondCheckBoxChecked}
-          isChecked={isFirstCheckBoxChecked}
-          value={isFirstCheckBoxChecked ? "checked" : ""}
-          onChange={handleFirstCheckBoxChange}
-          style={styles.checkbox}
-        >
-          <CheckboxIndicator>
-            <CheckboxIcon as={CheckIcon} />
-          </CheckboxIndicator>
-          <CheckboxLabel style={styles.checkLabel}>Encontrado</CheckboxLabel>
-        </Checkbox>
-
-        <Checkbox
-          size="md"
-          isDisabled={isFirstCheckBoxChecked}
-          isChecked={isSecondCheckBoxChecked}
-          value={isSecondCheckBoxChecked ? "checked" : ""}
-          onChange={handleSecondCheckBoxChange}
-          style={styles.checkbox}
-        >
-          <CheckboxIndicator>
-            <CheckboxIcon as={CheckIcon} />
-          </CheckboxIndicator>
-          <CheckboxLabel style={styles.checkLabel}>Não encontrado</CheckboxLabel>
-        </Checkbox>
+        <Select selectedValue={animalSelecionadoId} onValueChange={setAnimalSelecionadoId}>
+          <SelectTrigger>
+            <SelectInput placeholder="Selecione um animal" />
+            <SelectIcon as={ChevronDown} />
+          </SelectTrigger>
+          <SelectPortal>
+            <SelectBackdrop />
+            <SelectContent>
+              <SelectDragIndicatorWrapper>
+                <SelectDragIndicator />
+              </SelectDragIndicatorWrapper>
+              {animais.map((animal) => (
+                <SelectItem key={animal.id} label={animal.nome} value={animal.id} />
+              ))}
+            </SelectContent>
+          </SelectPortal>
+        </Select>
       </View>
 
-      <Input
-        style={styles.input}
-        variant="outline"
-        size="md"
-        mb={8}
-        width={"90%"}
-        isDisabled={!isInputEnable}
-      >
-        <InputField placeholder="Observações (opcional)" />
-      </Input>
+      {animalSelecionado && (
+        <>
+          <Text style={styles.petName}>🐶 {animalSelecionado.nome}</Text>
+          <Text style={styles.address}>{animalSelecionado.endereco}</Text>
 
-      <Button style={styles.button} size="lg" variant="solid" action="primary">
-        <ButtonText>Mudar Status</ButtonText>
-        <ButtonIcon as={HeartHandshake} />
-      </Button>
+          <View style={styles.checkGroup}>
+            <Checkbox
+              size="md"
+              isDisabled={isSecondCheckBoxChecked}
+              isChecked={isFirstCheckBoxChecked}
+              value={isFirstCheckBoxChecked ? "checked" : ""}
+              onChange={handleFirstCheckBoxChange}
+              style={styles.checkbox}
+            >
+              <CheckboxIndicator>
+                <CheckboxIcon as={CheckIcon} />
+              </CheckboxIndicator>
+              <CheckboxLabel style={styles.checkLabel}>Encontrado</CheckboxLabel>
+            </Checkbox>
 
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: animalSelecionado.latitude,
-          longitude: animalSelecionado.longitude,
-          latitudeDelta: 0.002,
-          longitudeDelta: 0.002,
-        }}
-      >
-        <Marker
-          coordinate={{
-            latitude: animalSelecionado.latitude,
-            longitude: animalSelecionado.longitude,
-          }}
-          image={require("../img/tach_red.png")}
-        />
-        <Circle
-          center={{
-            latitude: animalSelecionado.latitude,
-            longitude: animalSelecionado.longitude,
-          }}
-          radius={80}
-          strokeColor="red"
-          strokeWidth={2}
-          fillColor="rgba(255, 0, 0, 0.1)"
-        />
-      </MapView>
+            <Checkbox
+              size="md"
+              isDisabled={isFirstCheckBoxChecked}
+              isChecked={isSecondCheckBoxChecked}
+              value={isSecondCheckBoxChecked ? "checked" : ""}
+              onChange={handleSecondCheckBoxChange}
+              style={styles.checkbox}
+            >
+              <CheckboxIndicator>
+                <CheckboxIcon as={CheckIcon} />
+              </CheckboxIndicator>
+              <CheckboxLabel style={styles.checkLabel}>Não encontrado</CheckboxLabel>
+            </Checkbox>
+          </View>
+
+          <Input
+            style={styles.input}
+            variant="outline"
+            size="md"
+            mb={8}
+            width={"90%"}
+            isDisabled={!isInputEnable}
+          >
+            <InputField placeholder="Observações (opcional)" />
+          </Input>
+
+          <Button style={styles.button} size="lg" variant="solid" action="primary">
+            <ButtonText>Mudar Status</ButtonText>
+            <ButtonIcon as={HeartHandshake} />
+          </Button>
+
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: animalSelecionado.latitude,
+              longitude: animalSelecionado.longitude,
+              latitudeDelta: 0.002,
+              longitudeDelta: 0.002,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: animalSelecionado.latitude,
+                longitude: animalSelecionado.longitude,
+              }}
+              image={require("../img/tach_red.png")}
+            />
+            <Circle
+              center={{
+                latitude: animalSelecionado.latitude,
+                longitude: animalSelecionado.longitude,
+              }}
+              radius={80}
+              strokeColor="red"
+              strokeWidth={2}
+              fillColor="rgba(255, 0, 0, 0.1)"
+            />
+          </MapView>
+        </>
+      )}
 
       <Link style={styles.link} href="/home">
         <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
@@ -199,17 +218,8 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: "90%",
-    borderWidth: 1,
-    borderColor: "#cbd5e0",
-    borderRadius: 8,
     marginVertical: 10,
-    backgroundColor: "#fff",
   },
-  picker: {
-  height: 44,
-  width: "100%",
-  color: "#000", // Garante visibilidade do texto
-},
   petName: {
     fontSize: 22,
     fontWeight: "bold",

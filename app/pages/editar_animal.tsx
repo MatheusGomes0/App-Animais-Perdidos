@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import {
   Input,
   InputField,
@@ -16,18 +15,31 @@ import {
   ButtonText,
   ButtonIcon,
   Heading,
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
 } from "@gluestack-ui/themed";
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
-import { Disc3 } from "lucide-react-native";
+import { ChevronDownIcon, Disc3 } from "lucide-react-native";
+import { FontAwesome5, AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { db } from "../database/firebaseConfig";
 import {
   collection,
+  query,
+  where,
   getDocs,
   doc,
   updateDoc,
   getDoc,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 export default function Animal() {
   const [animais, setAnimais] = useState<any[]>([]);
@@ -40,23 +52,33 @@ export default function Animal() {
   const [endereco, setEndereco] = useState("");
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [userUid, setUserUid] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAnimais = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "animais"));
-        const lista = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setAnimais(lista);
-      } catch (err) {
-        Alert.alert("Erro", "Erro ao buscar animais");
-      }
-    };
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
 
-    fetchAnimais();
+    if (currentUser) {
+      setUserUid(currentUser.uid);
+      buscarAnimaisDoUsuario(currentUser.uid);
+    } else {
+      Alert.alert("Erro", "Usuário não autenticado.");
+    }
   }, []);
+
+  const buscarAnimaisDoUsuario = async (uid: string) => {
+    try {
+      const q = query(collection(db, "animais"), where("usuarioId", "==", uid));
+      const snapshot = await getDocs(q);
+      const lista = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAnimais(lista);
+    } catch (err) {
+      Alert.alert("Erro", "Erro ao buscar animais do usuário.");
+    }
+  };
 
   useEffect(() => {
     if (nome && especie && raca && cor && endereco) {
@@ -92,7 +114,7 @@ export default function Animal() {
   }, [selectedAnimalId]);
 
   const handleUpdate = async () => {
-    if (!selectedAnimalId) return;
+    if (!selectedAnimalId || !userUid) return;
 
     try {
       const docRef = doc(db, "animais", selectedAnimalId);
@@ -102,11 +124,12 @@ export default function Animal() {
         raca,
         cor,
         endereco,
+        usuarioId: userUid,
       });
 
       Alert.alert("Sucesso", "Animal atualizado com sucesso!");
     } catch (err) {
-      Alert.alert("Erro ao cadastrar", String(err));
+      Alert.alert("Erro ao atualizar", String(err));
     }
   };
 
@@ -123,17 +146,27 @@ export default function Animal() {
         </View>
 
         <Text style={styles.label}>Selecionar Animal</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedAnimalId}
-            onValueChange={(value) => setSelectedAnimalId(value)}
-            style={styles.picker}
+        <View style={styles.selectContainer}>
+          <Select
+            selectedValue={selectedAnimalId || ""}
+            onValueChange={(value: string) => setSelectedAnimalId(value)}
           >
-            <Picker.Item label="-- Selecione --" value={null} />
-            {animais.map((a) => (
-              <Picker.Item key={a.id} label={a.nome} value={a.id} />
-            ))}
-          </Picker>
+            <SelectTrigger>
+              <SelectInput placeholder="-- Selecione --" />
+              <SelectIcon as={ChevronDownIcon} />
+            </SelectTrigger>
+            <SelectPortal>
+              <SelectBackdrop />
+              <SelectContent>
+                <SelectDragIndicatorWrapper>
+                  <SelectDragIndicator />
+                </SelectDragIndicatorWrapper>
+                {animais.map((a) => (
+                  <SelectItem key={a.id} label={a.nome} value={a.id} />
+                ))}
+              </SelectContent>
+            </SelectPortal>
+          </Select>
         </View>
 
         <Text style={styles.label}>Nome</Text>
@@ -185,9 +218,8 @@ export default function Animal() {
           <ButtonIcon as={Disc3} />
         </Button>
 
-
-         <Link style={styles.link} href="/home">
-        <AntDesign name="arrowleft" size={20} color="#3182ce" /> Voltar para Home
+        <Link style={styles.link} href="/home">
+          <AntDesign name="arrowleft" size={20} color="#3182ce" /> Voltar para Home
         </Link>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -226,17 +258,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#cbd5e0",
   },
-  pickerContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#cbd5e0",
+  selectContainer: {
     width: "90%",
     marginBottom: 10,
-  },
-  picker: {
-    height: 50,
-    width: "100%",
   },
   button: {
     marginTop: 30,
@@ -245,9 +269,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   link: {
-      marginTop: 20,
-      flexDirection: "row",
-      alignItems: "center",
-      color: "#2b6cb0",
-    },
+    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    color: "#2b6cb0",
+  },
 });

@@ -54,7 +54,7 @@ export default function Animal() {
         endereco: enderecoDesaparecimento,
         status: false,
         criado_em: new Date(),
-        donoId: user.uid, // Associa corretamente ao usuário autenticado
+        usuarioId: user.uid, // Associa corretamente ao usuário autenticado
       });
 
       Alert.alert("Sucesso", "Animal cadastrado com sucesso!");
