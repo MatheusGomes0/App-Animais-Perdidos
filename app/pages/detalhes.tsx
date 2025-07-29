@@ -1,9 +1,64 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../database/firebaseConfig";
 
 export default function Detalhes() {
   const router = useRouter();
+  const { animalId } = useLocalSearchParams();
+
+  const [animal, setAnimal] = useState<any>(null);
+  const [usuario, setUsuario] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnimalEDono = async () => {
+      try {
+        const animalRef = doc(db, "animais", String(animalId));
+        const animalSnap = await getDoc(animalRef);
+
+        if (animalSnap.exists()) {
+          const animalData = animalSnap.data();
+          setAnimal(animalData);
+
+          // Buscar usuário com base no campo usuarioId
+          if (animalData.usuarioId) {
+            const usuarioRef = doc(db, "usuarios", animalData.usuarioId);
+            const usuarioSnap = await getDoc(usuarioRef);
+
+            if (usuarioSnap.exists()) {
+              setUsuario(usuarioSnap.data());
+            }
+          }
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchAnimalEDono();
+  }, [animalId]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#2b6cb0" />
+      </View>
+    );
+  }
+
+  if (!animal) {
+    return (
+      <View style={styles.container}>
+        <Text>Animal não encontrado.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -13,14 +68,19 @@ export default function Detalhes() {
           <Text style={styles.title}>Detalhes do Animal</Text>
         </View>
 
-        <Text style={styles.label}><Text style={styles.labelBold}>Nome:</Text> Rex</Text>
-        <Text style={styles.label}><Text style={styles.labelBold}>Raça:</Text> Labrador</Text>
-        <Text style={styles.label}><Text style={styles.labelBold}>Endereço:</Text> Rua das Flores, 123</Text>
-        <Text style={styles.label}><Text style={styles.labelBold}>Desaparecimento:</Text> 24/07/2025</Text>
-        <Text style={styles.label}><Text style={styles.labelBold}>Contato:</Text> (11) 91234-5678</Text>
-        <Text style={styles.label}><Text style={styles.labelBold}>Nome do dono:</Text> Matheus</Text>
+        <Text style={styles.label}><Text style={styles.labelBold}>Nome:</Text> {animal.nome}</Text>
+        <Text style={styles.label}><Text style={styles.labelBold}>Raça:</Text> {animal.raca}</Text>
+        <Text style={styles.label}><Text style={styles.labelBold}>Endereço:</Text> {animal.endereco}</Text>
+        <Text style={styles.label}><Text style={styles.labelBold}>Espécie:</Text> {animal.especie}</Text>
 
-        <TouchableOpacity style={styles.backButton} onPress={() => router.push("/pages/localizar")}>
+        {usuario && (
+          <>
+            <Text style={styles.label}><Text style={styles.labelBold}>Nome do dono:</Text> {usuario.nome}</Text>
+            <Text style={styles.label}><Text style={styles.labelBold}>Contato:</Text> {usuario.telefone}</Text>
+          </>
+        )}
+
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
           <Text style={styles.backText}>Voltar</Text>
         </TouchableOpacity>

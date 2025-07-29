@@ -119,7 +119,10 @@ export default function Localizar() {
               title={animal.nome}
               description={animal.endereco}
               image={require("../img/tach_blue.png")}
-              onPress={() => router.push(`/pages/detalhes`)} // adicionar id do animal para ir aos detalhes
+               onPress={() => router.push({
+                pathname: "/pages/detalhes",
+                params: { animalId: animal.id }, // passe o ID do animal do Firestore
+             })}
             />
           ))}
         </MapView>
