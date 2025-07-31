@@ -1,0 +1,244 @@
+import { useState, useEffect } from "react";
+import {
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Heading,
+  Input,
+  InputField,
+} from "@gluestack-ui/themed";
+import { Text, StyleSheet, View, Alert, ScrollView } from "react-native";
+import { Link } from "expo-router";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { Disc3 } from "lucide-react-native";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db, auth } from "../database/firebaseConfig";
+
+export default function Dono() {
+  const [nome, setNome] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  useEffect(() => {
+    if (
+      nome && cpf && endereco && bairro && cidade && estado &&
+      telefone && email && senha && confirmarSenha
+    ) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [
+    nome, cpf, endereco, bairro, cidade,
+    estado, telefone, email, senha, confirmarSenha
+  ]);
+
+  const handleSubmit = async () => {
+    if (senha !== confirmarSenha) {
+      Alert.alert("Erro", "As senhas não coincidem.");
+      return;
+    }
+
+    try {
+      // 1. Cria usuário no Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      const user = userCredential.user;
+
+      // 2. Salva dados adicionais no Firestore com uid
+      await setDoc(doc(db, "usuarios", user.uid), {
+        nome,
+        cpf,
+        endereco,
+        bairro,
+        cidade,
+        estado,
+        telefone,
+        email,
+      });
+
+      Alert.alert("Sucesso", "Usuário registrado com sucesso!");
+
+      // 3. Limpa os campos
+      setNome("");
+      setCpf("");
+      setEndereco("");
+      setBairro("");
+      setCidade("");
+      setEstado("");
+      setTelefone("");
+      setEmail("");
+      setSenha("");
+      setConfirmarSenha("");
+      setIsButtonDisabled(true);
+
+    } catch (error: any) {
+      console.error("Erro ao registrar:", error);
+      Alert.alert("Erro", error.message);
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.logoContainer}>
+        <FontAwesome5 name="cat" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+        <Heading style={styles.heading}> Cadastro</Heading>
+        <FontAwesome5 name="dog" size={32} color="#2b6cb0" style={{ marginLeft: 8 }} />
+      </View>
+
+      <Text style={styles.label}>Nome:</Text>
+      <Input style={styles.input}>
+        <InputField value={nome} onChangeText={setNome} placeholder="Digite seu nome" />
+      </Input>
+
+      <Text style={styles.label}>CPF:</Text>
+      <Input style={styles.input}>
+        <InputField
+          value={cpf}
+          onChangeText={(text) => setCpf(text.replace(/[^0-9]/g, "").slice(0, 11))}
+          placeholder="Digite seu CPF"
+          keyboardType="numeric"
+        />
+      </Input>
+
+      <Text style={styles.label}>Endereço:</Text>
+      <Input style={styles.input}>
+        <InputField value={endereco} onChangeText={setEndereco} placeholder="Rua e número" />
+      </Input>
+
+      <Text style={styles.label}>Bairro:</Text>
+      <Input style={styles.input}>
+        <InputField value={bairro} onChangeText={setBairro} placeholder="Digite seu bairro" />
+      </Input>
+
+      <View style={styles.row}>
+        <View style={styles.cityContainer}>
+          <Text style={styles.label}>Cidade:</Text>
+          <Input style={styles.input}>
+            <InputField value={cidade} onChangeText={setCidade} placeholder="Digite sua cidade" />
+          </Input>
+        </View>
+        <View style={styles.stateContainer}>
+          <Text style={styles.label}>Estado:</Text>
+          <Input style={styles.input}>
+            <InputField value={estado} onChangeText={setEstado} placeholder="UF" maxLength={2} />
+          </Input>
+        </View>
+      </View>
+
+      <Text style={styles.label}>Telefone:</Text>
+      <Input style={styles.input}>
+        <InputField value={telefone} onChangeText={setTelefone} placeholder="(XX) XXXXX-XXXX" keyboardType="phone-pad" />
+      </Input>
+
+      <Text style={styles.label}>E-mail:</Text>
+      <Input style={styles.input}>
+        <InputField value={email} onChangeText={setEmail} placeholder="seu@email.com" keyboardType="email-address" autoCapitalize="none" />
+      </Input>
+
+      <Text style={styles.label}>Senha:</Text>
+      <Input style={styles.input}>
+        <InputField value={senha} onChangeText={setSenha} placeholder="Digite uma senha" secureTextEntry />
+      </Input>
+
+      <Text style={styles.label}>Confirmar Senha:</Text>
+      <Input style={styles.input}>
+        <InputField value={confirmarSenha} onChangeText={setConfirmarSenha} placeholder="Confirme sua senha" secureTextEntry />
+      </Input>
+
+      <Button style={styles.button} onPress={handleSubmit} isDisabled={isButtonDisabled}>
+        <ButtonText>Registrar-se</ButtonText>
+        <ButtonIcon style={styles.btIcon} as={Disc3} />
+      </Button>
+
+      <Link style={styles.link} href="/">
+        <AntDesign name="arrowleft" size={24} color="#2b6cb0" />
+        <Text style={styles.linkText}> Voltar ao Login</Text>
+      </Link>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: "#f5f7fa",
+    alignItems: "center",
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  heading: {
+    fontSize: 28,
+    color: "#165a72",
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginTop: 10,
+    textAlign: "center",
+  },
+  label: {
+    alignSelf: "flex-start",
+    marginLeft: 8,
+    marginTop: 12,
+    marginBottom: 6,
+    fontSize: 16,
+    color: "#2b6cb0",
+    fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderColor: "#cbd5e0",
+    marginBottom: 12,
+  },
+  row: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  cityContainer: {
+    width: "65%",
+  },
+  stateContainer: {
+    width: "30%",
+  },
+  button: {
+    width: "100%",
+    backgroundColor: "#2b6cb0",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    marginTop: 20,
+  },
+  btIcon: {
+    marginLeft: 6,
+    color: "#fff",
+  },
+  link: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 25,
+    marginBottom: 40,
+  },
+  linkText: {
+    marginLeft: 8,
+    color: "#2b6cb0",
+    fontSize: 16,
+  },
+});
