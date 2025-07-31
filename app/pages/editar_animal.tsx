@@ -138,7 +138,10 @@ export default function Animal() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.logoContainer}>
           <FontAwesome5 name="cat" size={32} color="#2b6cb0" />
           <Heading style={styles.heading}>Editar Animal Perdido</Heading>
@@ -230,6 +233,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 40,
     paddingHorizontal: 20,
     backgroundColor: "#f5f7fa",

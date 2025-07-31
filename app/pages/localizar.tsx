@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { FontAwesome5, AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../database/firebaseConfig"; // ajuste esse caminho se necessário
+import { db } from "../database/firebaseConfig"; // ajuste se necessário
 
 type Animal = {
   id: string;
@@ -13,6 +19,7 @@ type Animal = {
   endereco: string;
   lat: number;
   lon: number;
+  status: boolean;
 };
 
 export default function Localizar() {
@@ -25,12 +32,10 @@ export default function Localizar() {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-
       if (status !== "granted") {
         setErrorMsg("Permissão de localização negada.");
         return;
       }
-
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
     })();
@@ -50,19 +55,22 @@ export default function Localizar() {
         for (const animal of animaisData) {
           if (!animal.endereco) continue;
 
-          const geoRes = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(animal.endereco)}`
-          );
-          const geoData = await geoRes.json();
-
-          if (geoData && geoData.length > 0) {
-            animaisComCoords.push({
-              id: animal.id,
-              nome: animal.nome || "Animal",
-              endereco: animal.endereco,
-              lat: parseFloat(geoData[0].lat),
-              lon: parseFloat(geoData[0].lon),
-            });
+          // Geocodifica endereço com expo-location
+          try {
+            const geocodeResults = await Location.geocodeAsync(animal.endereco);
+            if (geocodeResults.length > 0) {
+              const { latitude, longitude } = geocodeResults[0];
+              animaisComCoords.push({
+                id: animal.id,
+                nome: animal.nome || "Animal",
+                endereco: animal.endereco,
+                lat: latitude,
+                lon: longitude,
+                status: animal.status ?? false,
+              });
+            }
+          } catch (e) {
+            console.warn(`Não foi possível geocodificar o endereço: ${animal.endereco}`, e);
           }
         }
 
@@ -111,24 +119,31 @@ export default function Localizar() {
             pinColor="blue"
           />
 
-          {/* Animais do Firestore */}
-          {animais.map(animal => (
-            <Marker
-              key={animal.id}
-              coordinate={{ latitude: animal.lat, longitude: animal.lon }}
-              title={animal.nome}
-              description={animal.endereco}
-              image={require("../img/tach_blue.png")}
-               onPress={() => router.push({
-                pathname: "/pages/detalhes",
-                params: { animalId: animal.id }, // passe o ID do animal do Firestore
-             })}
-            />
-          ))}
+          {/* Animais do Firestore (somente não encontrados) */}
+          {animais
+            .filter(animal => animal.status === false)
+            .map(animal => (
+              <Marker
+                key={animal.id}
+                coordinate={{ latitude: animal.lat, longitude: animal.lon }}
+                title={animal.nome}
+                description={animal.endereco}
+                image={require("../img/tach_blue.png")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/pages/detalhes",
+                    params: { animalId: animal.id },
+                  })
+                }
+              />
+            ))}
         </MapView>
       )}
 
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/home")}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.push("/home")}
+      >
         <AntDesign name="arrowleft" size={20} color="#2b6cb0" />
         <Text style={styles.backButtonText}>Voltar à Home</Text>
       </TouchableOpacity>
